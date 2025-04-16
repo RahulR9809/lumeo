@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "790883888590",
+    "project_id": "lumeo-b40e4",
+    "storage_bucket": "lumeo-b40e4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790883888590:android:d9e679eb116f31f1d64f9f",
+        "android_client_info": {
+          "package_name": "com.example.lumeo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrGbfpaRrrIpmQgYO3ag0Md6bR45m_o70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
