@@ -14,7 +14,7 @@ class ProfileFormWidget extends StatelessWidget {
         sizeVer(18),
         TextFormField(
           controller: controller,
-          style: TextStyle(color: secondaryColor),
+          style: TextStyle(color: whiteColor),
         ),
         Container(width: double.infinity, height: 1, color: secondaryColor),
       ],

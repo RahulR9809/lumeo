@@ -8,6 +8,7 @@ class IsLoggedInUsecase {
 
 
 Future<bool> call(){
+  print('usercase');
   return repository .isSignIn();
 }
 } 

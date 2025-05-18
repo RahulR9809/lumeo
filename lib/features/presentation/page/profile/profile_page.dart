@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/presentation/cubit/auth/cubit/auth_cubit.dart';
+import 'package:lumeo/widget_profile.dart';
 
 class ProfilePage extends StatefulWidget {
   final UserEntity currentUser;
-  const ProfilePage({super.key,required this.currentUser});
+  const ProfilePage({super.key, required this.currentUser});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -20,6 +21,7 @@ class _ProfilePageState extends State<ProfilePage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    print("this is the profile url${widget.currentUser.profileUrl}");
   }
 
   @override
@@ -32,14 +34,14 @@ class _ProfilePageState extends State<ProfilePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:  Text(
+        title: Text(
           "${widget.currentUser.username}",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
             onPressed: () {
-              _openBottomModelSheet(context);
+              _openBottomModelSheet(context, widget.currentUser);
             },
             icon: const Icon(Icons.menu),
           ),
@@ -51,27 +53,44 @@ class _ProfilePageState extends State<ProfilePage>
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage("assets/profile.jpg"),
-                ),
+               CircleAvatar(
+  radius: 40,
+  backgroundColor: const Color.fromARGB(255, 83, 82, 82),
+  child: ClipOval(
+    child: SizedBox(
+      width: 80, 
+      height: 80,
+      child: profilewidget(imageUrl: widget.currentUser.profileUrl),
+    ),
+  ),
+),
+
                 const SizedBox(width: 20),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children:  [
-                      _ProfileStat(count: "${widget.currentUser.totalPost}", label: "Posts"),
-                      _ProfileStat(count: "${widget.currentUser.totalFollowers}", label: "Followers"),
-                      _ProfileStat(count: "${widget.currentUser.following!.length}", label: "Following"),
+                    children: [
+                      _ProfileStat(
+                        count: "${widget.currentUser.totalPost}",
+                        label: "Posts",
+                      ),
+                      _ProfileStat(
+                        count: "${widget.currentUser.totalFollowers}",
+                        label: "Followers",
+                      ),
+                      _ProfileStat(
+                        count: "${widget.currentUser.following!.length}",
+                        label: "Following",
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-           Padding(
+          Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: 
+            child:
             // Align(
             //   alignment: Alignment.centerLeft,
             //   child:
@@ -80,24 +99,31 @@ class _ProfilePageState extends State<ProfilePage>
             //     style: TextStyle(fontSize: 14),
             //   ),
             // ),
-
-             Row(
-               children: [
-                 Column(
-                   crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                     Text("${widget.currentUser.name ==""? widget.currentUser.username:widget.currentUser.name}", style: TextStyle(fontSize: 14)),
-                     SizedBox(height: 4),
-                     Text(widget.currentUser.bio ?? '', style: TextStyle(fontSize: 14)),
-                     SizedBox(height: 4),
-                     Text(widget.currentUser.link ?? '', style: TextStyle(fontSize: 14, color: Colors.blue)),
-                   ],
-                 ),
-               ],
-             ),
-
+            Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${widget.currentUser.name == "" ? widget.currentUser.username : widget.currentUser.name}",
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      widget.currentUser.bio ?? '',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      widget.currentUser.link ?? '',
+                      style: TextStyle(fontSize: 14, color: Colors.blue),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-          
+
           TabBar(
             controller: _tabController,
             tabs: const [
@@ -153,15 +179,15 @@ class _ProfilePageState extends State<ProfilePage>
     );
   }
 
-  _openBottomModelSheet(BuildContext context) {
+  _openBottomModelSheet(BuildContext context, currentUser) {
     return showModalBottomSheet(
       context: context,
       builder: (context) {
         return Container(
-          height: 150,
+          height: 180,
           decoration: BoxDecoration(color: backGroundColor),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 10, top: 4),
@@ -169,7 +195,7 @@ class _ProfilePageState extends State<ProfilePage>
                   "More Options",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontSize: 20,
                     color: whiteColor,
                   ),
                 ),
@@ -181,14 +207,34 @@ class _ProfilePageState extends State<ProfilePage>
                 padding: const EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                
-                    Navigator.pushNamed(context, "editProfilepage");
+                    Navigator.pushNamed(
+                      context,
+                      "editProfilepage",
+                      arguments: currentUser,
+                    );
                   },
                   child: Text(
                     "Edit Profile",
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: whiteColor,
+                    ),
+                  ),
+                ),
+              ),    sizeVer(5),
+              Divider(thickness: 1, color: secondaryColor),
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                   
+                  },
+                  child: Text(
+                    "saved Post",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
                       color: whiteColor,
                     ),
                   ),
@@ -200,14 +246,18 @@ class _ProfilePageState extends State<ProfilePage>
                 padding: const EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.pushNamedAndRemoveUntil(context, PageConst.loginPage, (route)=>false);
-                 BlocProvider.of<AuthCubit>(context).loggedOut();
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      PageConst.loginPage,
+                      (route) => false,
+                    );
+                    BlocProvider.of<AuthCubit>(context).loggedOut();
                   },
                   child: Text(
                     "Logout",
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
                       color: whiteColor,
                     ),
                   ),

@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lumeo/features/presentation/cubit/auth/cubit/auth_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/credential/cubit/credential_cubit.dart';
+import 'package:lumeo/features/presentation/cubit/post/cubit/post_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/user/cubit/get_single_user/cubit/get_single_user_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/user/cubit/user_cubit.dart';
 import 'package:lumeo/features/presentation/page/credentials/login_page.dart';
@@ -15,7 +15,6 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await di.init();
-  Fluttertoast.cancel();
   runApp(const MyApp());
 }
 
@@ -30,6 +29,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create:(_)=>di.sl<CredentialCubit>()),
          BlocProvider(create:(_)=>di.sl<UserCubit>()),
         BlocProvider(create:(_)=>di.sl<GetSingleUserCubit>()),
+        BlocProvider(create: (_)=>di.sl<PostCubit>())
       ],
       child: MaterialApp(
         title: 'Lumeo',
@@ -42,9 +42,12 @@ class MyApp extends StatelessWidget {
           "/": (context) {
             return BlocBuilder<AuthCubit, AuthState>(
               builder: (context, authstate) {
+                 print(authstate);
                 if (authstate is Authenticated) {
+                 
                   return MainScreen(uid: authstate.uid);
                 } else {
+                  
                   return LoginPage();
                 }
               },

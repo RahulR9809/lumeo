@@ -4,16 +4,31 @@ import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 class UserModel extends UserEntity {
   @override
   final String? uid;
+  @override
   final String? username;
+  @override
   final String? bio;
+  @override
   final String? link;
+  @override
   final String? email;
+  @override
   final String? profileUrl;
+
+  @override
+  final String? videoUrl;
+
+  @override
   final List? followers;
+  @override
   final List? following;
+  @override
   final num? totalFollowers;
+  @override
   final num? totalfollowing;
+  @override
   final num? totalPost;
+  @override
   final String? name;
 
   const UserModel({
@@ -23,6 +38,7 @@ class UserModel extends UserEntity {
     this.link,
     this.email,
     this.profileUrl,
+    this.videoUrl,
     this.followers,
     this.following,
     this.totalFollowers,
@@ -36,6 +52,7 @@ class UserModel extends UserEntity {
          totalFollowers: totalFollowers,
          username: username,
          profileUrl: profileUrl,
+         videoUrl: videoUrl,
          link: link,
          following: following,
          bio: bio,
@@ -56,7 +73,7 @@ class UserModel extends UserEntity {
       uid: snapshot['uid'],
       link: snapshot['link'],
       profileUrl: snapshot['profileUrl'],
-
+videoUrl: snapshot['videoUrl'],
       followers: List.from(snap.get("followers")),
       following: List.from(snap.get("following")),
     );
@@ -68,6 +85,7 @@ class UserModel extends UserEntity {
 "link":link,
 "email":email,
 "profileUrl":profileUrl,
+"videoUrl":videoUrl,
 "followers":followers,
 "following":following,
 "totalFollowers":totalFollowers,

@@ -9,6 +9,8 @@ class GetSingleUserUsecase {
 
 
 Stream<List<UserEntity>> call(String uid){
+      print("Usecase called with uid: $uid");
+
   return repository . getSingleUser(uid);
 }
 } 

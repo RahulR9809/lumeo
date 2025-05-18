@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 import 'package:lumeo/consts.dart';
-import 'package:lumeo/features/domain/usecases/firebase_usecases/user/get_current_uid_usecase.dart';
+import 'package:lumeo/features/domain/entities/post/post_entity.dart';
+import 'package:lumeo/features/presentation/cubit/post/cubit/post_cubit.dart';
+import 'package:lumeo/features/presentation/page/home/widgets/single_post_card_widget.dart';
 import 'package:lumeo/injection_container.dart' as di;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -12,15 +16,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // @override
+  //   void initState() {
+  //   di.sl<GetCurrentUidUsecase>().call().then((value){
+  //     value
+  //   })
 
-// @override
-//   void initState() {
-//   di.sl<GetCurrentUidUsecase>().call().then((value){
-//     value
-//   })
-
-//     super.initState();
-//   }
+  //     super.initState();
+  //   }
 
   @override
   Widget build(BuildContext context) {
@@ -37,188 +40,83 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: secondaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    sizeHor(10),
-                    Text(
-                      "Username",
-                      style: TextStyle(
-                        color: whiteColor,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: () {
-                    _openBottomModelSheet(context);
-                  },
-                  child: Icon(Icons.more_vert, color: whiteColor),
-                ),
-              ],
-            ),
-            sizeVer(10),
-            Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.30,
-              color: secondaryColor,
-            ),
-            sizeVer(10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.favorite_outline, color: whiteColor),
-                    sizeHor(10),
-                    GestureDetector(
-                      onTap: () {
-                     Navigator.pushNamed(context, PageConst.commentPage);
-                      },
-                      child: Icon(MdiIcons.commentOutline, color: whiteColor),
-                    ),
-                    sizeHor(10),
-                    Icon(MdiIcons.sendOutline, color: whiteColor),
-                  ],
-                ),
-                Icon(MdiIcons.bookmarkOutline, color: whiteColor),
-              ],
-            ),
-            sizeVer(5),
-            Row(
-              children: [
-                Text(
-                  "3",
-                  style: TextStyle(
-                    color: secondaryColor,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                sizeHor(5),
-                Text(
-                  "likes",
-                  style: TextStyle(
-                    color: secondaryColor,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Text(
-                  "Username",
-                  style: TextStyle(
-                    color: whiteColor,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                sizeHor(10),
-                Text(
-                  "somedisc",
-                  style: TextStyle(
-                    color: whiteColor,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-
-            sizeVer(2),
-            Text(
-              "view all comments",
-              style: TextStyle(
-                color: secondaryColor,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            sizeVer(2),
-            Text(
-              "08/05/2025",
-              style: TextStyle(
-                color: secondaryColor,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
+      body: BlocProvider<PostCubit>(
+        create: (context) => di.sl<PostCubit>()..getPosts(post: PostEntity()),
+        child: BlocBuilder<PostCubit, PostState>(
+          builder: (context, poststate) {
+            if (poststate is PostLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (poststate is PostFailure) {
+              toast("Some error occcured while creating the post");
+            }
+            if (poststate is PostLoaded) {
+              return poststate.posts.isEmpty?_noPostFoundWidget(context):ListView.builder(
+                itemCount: poststate.posts.length,
+                itemBuilder: (context, index) {
+                  final post = poststate.posts[index];
+                  return SinglePostCardWidget(post: post);
+                },
+              );
+            }
+            return Center(child: CircularProgressIndicator());
+          },
         ),
       ),
     );
   }
 
-  _openBottomModelSheet(BuildContext context) {
-    return showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          height: 150,
-          decoration: BoxDecoration(color: backGroundColor),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 10, top: 4),
-                child: Text(
-                  "More Options",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: whiteColor,
-                  ),
-                ),
-              ),
-              sizeVer(5),
-              Divider(thickness: 1, color: secondaryColor),
-              sizeVer(5),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Text(
-                  "Delete Post",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: whiteColor,
-                  ),
-                ),
-              ),
-              sizeVer(5),
-              Divider(thickness: 1, color: secondaryColor),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: GestureDetector(
-                  onTap: () {
-                  Navigator.pushNamed(context, PageConst.updatePost);
-                  },
-                  child: Text(
-                    "Update Post",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                      color: whiteColor,
-                    ),
-                  ),
-                ),
-              ),
-            ],
+
+
+  Widget _noPostFoundWidget(BuildContext context) {
+  final theme = Theme.of(context);
+
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Lottie animation
+          Lottie.asset(
+            'assets/animation/Animation - 1747482878812.json',
+            width: 300,
+            height: 200,
+            repeat: true,
           ),
-        );
-      },
-    );
-  }
+
+          const SizedBox(height: 20),
+
+          Text(
+            'No Posts Found',
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          Text(
+            'Looks like there’s nothing to show here right now.\nTry creating a new post!',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: Colors.grey[600],
+            ),
+          ),
+
+          const SizedBox(height: 30),
+  Lottie.asset(
+            'assets/animation/Animation - 1747484207591.json',
+            width: 150,
+            height: 200,
+            repeat: true,
+          ),
+      
+        ],
+      ),
+    ),
+  );
+}
+
 }

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/presentation/cubit/user/cubit/get_single_user/cubit/get_single_user_cubit.dart';
-import 'package:lumeo/features/presentation/page/activities/activity_page.dart';
 import 'package:lumeo/features/presentation/page/home/home_page.dart';
+import 'package:lumeo/features/presentation/page/liked_posts/liked_posts.dart';
 import 'package:lumeo/features/presentation/page/post/upload_post_page.dart';
 import 'package:lumeo/features/presentation/page/profile/profile_page.dart';
 import 'package:lumeo/features/presentation/page/search/search_page.dart';
@@ -12,7 +12,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 
 class MainScreen extends StatefulWidget {
   final String uid;
-  const MainScreen({super.key, required this.uid});
+    final int? index;
+  const MainScreen({super.key, required this.uid, this.index});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -28,6 +29,7 @@ class _MainScreenState extends State<MainScreen> {
     BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
     pageController = PageController();
     super.initState();
+    _currentIndex = widget.index ?? 0;
   }
 
   @override
@@ -50,49 +52,49 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return BlocBuilder<GetSingleUserCubit, GetSingleUserState>(
       builder: (context, getSingleUserState) {
-        if(getSingleUserState is GetSingleUserLoaded){
-          final currentUser=getSingleUserState.user;
-return Scaffold(
-          bottomNavigationBar: CupertinoTabBar(
-            backgroundColor: backGroundColor,
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home, color: whiteColor),
-                label: 'Home',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.search, color: whiteColor),
-                label: 'search',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.add_circle, color: whiteColor),
-                label: 'add',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(MdiIcons.heart, color: whiteColor),
-                label: 'Activities',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person, color: whiteColor),
-                label: 'profile',
-              ),
-            ],
-            onTap: navigationTapped,
-          ),
-          body: PageView(
-            controller: pageController,
-            children: [
-              HomePage(),
-              SearchPage(),
-              UploadPostPage(),
-              ActivityPage(),
-              ProfilePage(currentUser: currentUser,),
-            ],
-            onPageChanged: onPageChanged,
-          ),
-        );
+        if (getSingleUserState is GetSingleUserLoaded) {
+          final currentUser = getSingleUserState.user;
+          return Scaffold(
+            bottomNavigationBar: CupertinoTabBar(
+              backgroundColor: backGroundColor,
+              items: [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home, color: whiteColor),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.search, color: whiteColor),
+                  label: 'Search',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.add_circle, color: whiteColor),
+                  label: 'post',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(MdiIcons.heart, color: whiteColor),
+                  label: 'Liked',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.person, color: whiteColor),
+                  label: 'profile',
+                ),
+              ],
+              onTap: navigationTapped,
+            ),
+            body: PageView(
+              controller: pageController,
+              children: [
+                HomePage(),
+                SearchPage(),
+                UploadPostPage(currentUser: currentUser,),
+                LikedPostPage(),
+                ProfilePage(currentUser: currentUser),
+              ],
+              onPageChanged: onPageChanged,
+            ),
+          );
         }
-        return Center( child:  CircularProgressIndicator(),);
+        return Center(child: CircularProgressIndicator());
       },
     );
   }

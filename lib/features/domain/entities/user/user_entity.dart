@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:equatable/equatable.dart';
 
 
@@ -9,17 +11,26 @@ class UserEntity extends Equatable{
   final String? link;
   final String? email;
   final String? profileUrl;
+  // final String? postUrl;
+   final String? videoUrl;
   final List? followers;
   final List? following;
   final num? totalFollowers;
   final num? totalfollowing;
   final num? totalPost;
 
-
+// final File? postImage;
+final File? profileImageFile;
+final File? videoFile;
   final String? password;
   final String? otherUid;
 
-  const UserEntity({
+  const UserEntity( {
+    //  this.postImage,
+    // this.postUrl,
+    this.videoUrl,
+    this.videoFile,
+    this.profileImageFile,
     this.uid,
    this.name,
     this.username,
@@ -44,7 +55,6 @@ name,
     bio,
     link,
     email,
-    profileUrl,
     followers,
     following,
     totalFollowers,
@@ -52,6 +62,12 @@ name,
     password,
     otherUid,
     totalPost,
+ profileUrl,
+//  postUrl,
+  videoUrl,
+  // postImage,
+profileImageFile,
+videoFile,
  ];
 }
 

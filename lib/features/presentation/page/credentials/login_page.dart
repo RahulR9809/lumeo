@@ -41,10 +41,12 @@ class _LoginPageState extends State<LoginPage> {
           }
         },
         builder: (context, credentialState) {
+          print(credentialState);
           if (credentialState is CredentialSuccess) {
             return BlocBuilder<AuthCubit, AuthState>(
               builder: (context, authState) {
                 if (authState is Authenticated) {
+                  print(authState);
                   return MainScreen(uid: authState.uid);
                 } else {
                   return _bodyWidget();

@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/presentation/cubit/auth/cubit/auth_cubit.dart';
@@ -7,6 +10,7 @@ import 'package:lumeo/features/presentation/cubit/credential/cubit/credential_cu
 import 'package:lumeo/features/presentation/page/credentials/main_screen/main_screen.dart';
 import 'package:lumeo/features/presentation/widgets/button_widget.dart';
 import 'package:lumeo/features/presentation/widgets/form_container_widget.dart';
+import 'package:lumeo/widget_profile.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -30,6 +34,23 @@ class _SignUpPageState extends State<SignUpPage> {
     _bioController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  File? _profileImage;
+
+  Future selectImage() async {
+    try {
+      final pickedFile = await ImagePicker.platform.getImageFromSource(
+        source: ImageSource.gallery,
+      );
+      setState(() {
+        if (pickedFile != null) {
+          _profileImage = File(pickedFile.path);
+        } else {
+          print('no image has been selected');
+        }
+      });
+    } catch (e) {}
   }
 
   @override
@@ -63,7 +84,6 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
-
   _bodyWidget() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -95,13 +115,15 @@ class _SignUpPageState extends State<SignUpPage> {
                     color: secondaryColor,
                     borderRadius: BorderRadius.circular(35),
                   ),
-                  child: Icon(Icons.person, color: whiteColor, size: 40),
+                  child: ClipRRect(borderRadius: BorderRadius.circular(35),child:profilewidget(image: _profileImage, ),),
                 ),
                 Positioned(
                   right: -15,
                   bottom: -13,
                   child: IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                        selectImage();
+                    },
                     icon: Icon(Icons.add_a_photo, color: blueColor),
                   ),
                 ),
@@ -114,15 +136,9 @@ class _SignUpPageState extends State<SignUpPage> {
             hintText: "Username",
           ),
           sizeVer(20),
-          FormContainerWidget(
-            controller: _emailController,
-             hintText: "Email",
-             ),
+          FormContainerWidget(controller: _emailController, hintText: "Email"),
           sizeVer(20),
-          FormContainerWidget(
-            controller: _bioController,
-             hintText: "Bio",
-             ),
+          FormContainerWidget(controller: _bioController, hintText: "Bio"),
           sizeVer(20),
           FormContainerWidget(
             controller: _passwordController,
@@ -154,8 +170,8 @@ class _SignUpPageState extends State<SignUpPage> {
                 ],
               )
               : SizedBox(width: 0, height: 0),
-          Flexible(flex: 2, child: Container()), 
-          Padding( 
+          Flexible(flex: 2, child: Container()),
+          Padding(
             padding: const EdgeInsets.symmetric(vertical: 30),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -164,7 +180,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   "Already have an account?",
                   style: TextStyle(color: whiteColor),
                 ),
-            
+
                 InkWell(
                   onTap: () {
                     Navigator.pushNamedAndRemoveUntil(
@@ -197,7 +213,7 @@ class _SignUpPageState extends State<SignUpPage> {
         .signUpUser(
           user: UserEntity(
             email: _emailController.text.trim(),
-            username: _usernameController.text,
+            username: _usernameController.text.trim(),
             password: _passwordController.text.trim(),
             bio: _bioController.text,
             totalPost: 0,
@@ -209,6 +225,7 @@ class _SignUpPageState extends State<SignUpPage> {
             profileUrl: "",
             name: "",
             uid: null,
+            profileImageFile: _profileImage
           ),
         )
         .then((onValue) {
