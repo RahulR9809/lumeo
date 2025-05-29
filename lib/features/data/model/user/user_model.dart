@@ -25,9 +25,9 @@ class UserModel extends UserEntity {
   @override
   final num? totalFollowers;
   @override
-  final num? totalfollowing;
+  final num? totalFollowing;
   @override
-  final num? totalPost;
+  final num? totalPosts;
   @override
   final String? name;
 
@@ -42,12 +42,12 @@ class UserModel extends UserEntity {
     this.followers,
     this.following,
     this.totalFollowers,
-    this.totalfollowing,
+    this.totalFollowing,
     this.name,
-    this.totalPost,
+    this.totalPosts,
   }) : super(
          uid: uid,
-         totalfollowing: totalfollowing,
+         totalFollowing: totalFollowing,
          followers: followers,
          totalFollowers: totalFollowers,
          username: username,
@@ -58,7 +58,7 @@ class UserModel extends UserEntity {
          bio: bio,
          name: name,
          email: email,
-         totalPost: totalPost,
+         totalPosts: totalPosts,
        );
   factory UserModel.fromSnapshot(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
@@ -66,10 +66,10 @@ class UserModel extends UserEntity {
       email: snapshot['email'],
       name: snapshot['name'],
       bio: snapshot['bio'],
-      totalFollowers: snapshot['totalFollower'],
-      totalfollowing: snapshot['toalFollowing'],
+      totalFollowers: snapshot['totalFollowers']??0,
+      totalFollowing: snapshot['totalFollowing']??0,
       username: snapshot['username'],
-      totalPost: snapshot['totalpost'],
+      totalPosts: snapshot['totalPosts'],
       uid: snapshot['uid'],
       link: snapshot['link'],
       profileUrl: snapshot['profileUrl'],
@@ -89,8 +89,8 @@ videoUrl: snapshot['videoUrl'],
 "followers":followers,
 "following":following,
 "totalFollowers":totalFollowers,
-"totalfollowing":totalfollowing,
-"totalPost":totalPost,
+"totalFollowing":totalFollowing,
+"totalPosts":totalPosts,
 "name":name,
  };
 }

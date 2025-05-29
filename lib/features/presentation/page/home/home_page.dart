@@ -4,6 +4,7 @@ import 'package:lottie/lottie.dart';
 import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/domain/entities/post/post_entity.dart';
 import 'package:lumeo/features/presentation/cubit/post/cubit/post_cubit.dart';
+import 'package:lumeo/features/presentation/page/chat/userlistpage.dart';
 import 'package:lumeo/features/presentation/page/home/widgets/single_post_card_widget.dart';
 import 'package:lumeo/injection_container.dart' as di;
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -16,15 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // @override
-  //   void initState() {
-  //   di.sl<GetCurrentUidUsecase>().call().then((value){
-  //     value
-  //   })
-
-  //     super.initState();
-  //   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +28,11 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Image.asset("assets/logo.png", height: 60),
-            Icon(MdiIcons.facebookMessenger, color: whiteColor, size: 28),
+            GestureDetector(
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>Userlistpage()));
+              },
+              child: Icon(MdiIcons.facebookMessenger, color: whiteColor, size: 28)),
           ],
         ),
       ),
@@ -44,8 +40,16 @@ class _HomePageState extends State<HomePage> {
         create: (context) => di.sl<PostCubit>()..getPosts(post: PostEntity()),
         child: BlocBuilder<PostCubit, PostState>(
           builder: (context, poststate) {
+            print(poststate);
             if (poststate is PostLoading) {
-              return Center(child: CircularProgressIndicator());
+              // return Center(child: CircularProgressIndicator());
+              return  Center(
+        child: Lottie.asset(
+          'assets/animation/new Animation.json',
+          width: 150,
+          height: 150,
+        ),
+      );
             }
             if (poststate is PostFailure) {
               toast("Some error occcured while creating the post");

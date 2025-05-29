@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lumeo/consts.dart';
+import 'package:lumeo/features/domain/entities/post/post_entity.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/presentation/cubit/auth/cubit/auth_cubit.dart';
-import 'package:lumeo/widget_profile.dart';
+import 'package:lumeo/features/presentation/cubit/get_single_post/cubit/get_single_post_cubit.dart';
+import 'package:lumeo/features/presentation/cubit/post/cubit/post_cubit.dart';
+import 'package:lumeo/features/presentation/cubit/user/cubit/get_single_user/cubit/get_single_user_cubit.dart';
+import 'package:lumeo/features/presentation/widgets/widget_profile.dart';
 
 class ProfilePage extends StatefulWidget {
   final UserEntity currentUser;
@@ -21,7 +25,12 @@ class _ProfilePageState extends State<ProfilePage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    print("this is the profile url${widget.currentUser.profileUrl}");
+    BlocProvider.of<GetSingleUserCubit>(
+      context,
+    ).getSingleUser(uid: widget.currentUser.uid!);
+    BlocProvider.of<PostCubit>(context).getPosts(post: PostEntity());
+    print('this is the current uid${widget.currentUser.uid}');
+    print('this is the other uid${widget.currentUser.otherUid}');
   }
 
   @override
@@ -32,6 +41,7 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    print('here');
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -53,17 +63,19 @@ class _ProfilePageState extends State<ProfilePage>
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-               CircleAvatar(
-  radius: 40,
-  backgroundColor: const Color.fromARGB(255, 83, 82, 82),
-  child: ClipOval(
-    child: SizedBox(
-      width: 80, 
-      height: 80,
-      child: profilewidget(imageUrl: widget.currentUser.profileUrl),
-    ),
-  ),
-),
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: const Color.fromARGB(255, 83, 82, 82),
+                  child: ClipOval(
+                    child: SizedBox(
+                      width: 80,
+                      height: 80,
+                      child: profilewidget(
+                        imageUrl: widget.currentUser.profileUrl,
+                      ),
+                    ),
+                  ),
+                ),
 
                 const SizedBox(width: 20),
                 Expanded(
@@ -71,16 +83,34 @@ class _ProfilePageState extends State<ProfilePage>
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       _ProfileStat(
-                        count: "${widget.currentUser.totalPost}",
+                        count: "${widget.currentUser.totalPosts ?? 0}",
                         label: "Posts",
                       ),
-                      _ProfileStat(
-                        count: "${widget.currentUser.totalFollowers}",
-                        label: "Followers",
+                      GestureDetector(
+                        onTap: (){
+                            Navigator.pushNamed(
+                            context,
+                            PageConst.followersPage,
+                            arguments: widget.currentUser,
+                          );
+                        },
+                        child: _ProfileStat(
+                          count: "${widget.currentUser.totalFollowers ?? 0}",
+                          label: "Followers",
+                        ),
                       ),
-                      _ProfileStat(
-                        count: "${widget.currentUser.following!.length}",
-                        label: "Following",
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            PageConst.followingPage,
+                            arguments: widget.currentUser,
+                          );
+                        },
+                        child: _ProfileStat(
+                          count: "${widget.currentUser.following!.length}",
+                          label: "Following",
+                        ),
                       ),
                     ],
                   ),
@@ -90,33 +120,24 @@ class _ProfilePageState extends State<ProfilePage>
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child:
-            // Align(
-            //   alignment: Alignment.centerLeft,
-            //   child:
-            //    Text(
-            //     "${widget.currentUser.name}\n${widget.currentUser.bio}\n${widget.currentUser.link}",
-            //     style: TextStyle(fontSize: 14),
-            //   ),
-            // ),
-            Row(
+            child: Row(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "${widget.currentUser.name == "" ? widget.currentUser.username : widget.currentUser.name}",
-                      style: TextStyle(fontSize: 14),
+                      style: TextStyle(fontSize: 15),
                     ),
                     SizedBox(height: 4),
                     Text(
                       widget.currentUser.bio ?? '',
-                      style: TextStyle(fontSize: 14),
+                      style: TextStyle(fontSize: 13),
                     ),
                     SizedBox(height: 4),
                     Text(
                       widget.currentUser.link ?? '',
-                      style: TextStyle(fontSize: 14, color: Colors.blue),
+                      style: TextStyle(fontSize: 13, color: Colors.blue),
                     ),
                   ],
                 ),
@@ -124,55 +145,47 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
 
-          TabBar(
-            controller: _tabController,
-            tabs: const [
-              Tab(icon: Icon(Icons.grid_on, size: 30)),
-              Tab(
-                icon: Icon(Icons.video_library, size: 30),
-              ), // Reels icon instead of tag
-            ],
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                GridView.builder(
+          BlocBuilder<PostCubit, PostState>(
+            builder: (context, postState) {
+              if (postState is PostLoaded) {
+                final posts =
+                    postState.posts
+                        .where(
+                          (post) => post.creatorUid == widget.currentUser.uid,
+                        )
+                        .toList();
+                return GridView.builder(
                   padding: const EdgeInsets.all(2),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
                     crossAxisSpacing: 2,
                     mainAxisSpacing: 2,
                   ),
-                  itemCount: 30,
+                  itemCount: posts.length,
+                  physics: ScrollPhysics(),
+                  shrinkWrap: true,
                   itemBuilder: (context, index) {
-                    return Container(color: Colors.grey[300]);
-                  },
-                ),
-                GridView.builder(
-                  padding: const EdgeInsets.all(2),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // Different size for videos
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2,
-                  ),
-                  itemCount: 10,
-                  itemBuilder: (context, index) {
-                    return Container(
-                      height: index % 2 == 0 ? 180 : 220, // Varying video sizes
-                      color: Colors.black,
-                      child: const Center(
-                        child: Icon(
-                          Icons.play_circle_outline,
-                          color: Colors.white,
-                          size: 50,
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                          context,
+                          PageConst.postDetailPage,
+                          arguments: posts[index].postId,
+                        );
+                      },
+                      child: Container(
+                        width: 100,
+                        height: 100,
+                        child: profilewidget(
+                          imageUrl: posts[index].postImageUrl,
                         ),
                       ),
                     );
                   },
-                ),
-              ],
-            ),
+                );
+              }
+              return Center(child: CircularProgressIndicator());
+            },
           ),
         ],
       ),
@@ -222,13 +235,14 @@ class _ProfilePageState extends State<ProfilePage>
                     ),
                   ),
                 ),
-              ),    sizeVer(5),
+              ),
+              sizeVer(5),
               Divider(thickness: 1, color: secondaryColor),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: GestureDetector(
                   onTap: () {
-                   
+                    Navigator.pushNamed(context, PageConst.savedPostpage);
                   },
                   child: Text(
                     "saved Post",

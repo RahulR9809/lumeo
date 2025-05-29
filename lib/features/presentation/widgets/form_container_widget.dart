@@ -37,7 +37,8 @@ class _FormContainerWidgetState extends State<FormContainerWidget> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: darkGreyColor,borderRadius:BorderRadius.circular(3)
+        color: darkGreyColor,
+        borderRadius:BorderRadius.circular(20)
       ),
       child: TextFormField(  
         style: const TextStyle(color:whiteColor ),
@@ -49,7 +50,7 @@ class _FormContainerWidgetState extends State<FormContainerWidget> {
       validator: widget.validator,
       onFieldSubmitted: widget.onFieldSubmitted,
       decoration: InputDecoration(
-        border: OutlineInputBorder(),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(18)),
         hintText: widget.hintText,
         hintStyle: const TextStyle(
           color: whiteColor, 

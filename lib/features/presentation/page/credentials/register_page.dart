@@ -10,7 +10,7 @@ import 'package:lumeo/features/presentation/cubit/credential/cubit/credential_cu
 import 'package:lumeo/features/presentation/page/credentials/main_screen/main_screen.dart';
 import 'package:lumeo/features/presentation/widgets/button_widget.dart';
 import 'package:lumeo/features/presentation/widgets/form_container_widget.dart';
-import 'package:lumeo/widget_profile.dart';
+import 'package:lumeo/features/presentation/widgets/widget_profile.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -216,9 +216,9 @@ class _SignUpPageState extends State<SignUpPage> {
             username: _usernameController.text.trim(),
             password: _passwordController.text.trim(),
             bio: _bioController.text,
-            totalPost: 0,
+            totalPosts: 0,
             totalFollowers: 0,
-            totalfollowing: 0,
+            totalFollowing: 0,
             followers: [],
             following: [],
             link: "",

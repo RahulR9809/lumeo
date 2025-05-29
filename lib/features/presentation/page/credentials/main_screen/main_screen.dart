@@ -87,7 +87,7 @@ class _MainScreenState extends State<MainScreen> {
                 HomePage(),
                 SearchPage(),
                 UploadPostPage(currentUser: currentUser,),
-                LikedPostPage(),
+                LikedPosts(),
                 ProfilePage(currentUser: currentUser),
               ],
               onPageChanged: onPageChanged,

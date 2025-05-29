@@ -10,7 +10,7 @@ part 'auth_state.dart';
 class AuthCubit extends Cubit<AuthState> {
   final SingnOutUsecase singnOutUsecase;
   final IsLoggedInUsecase isLoggedInUsecase;
-  final GetCurrentUidUsecase getCurrentUidUsecase;
+  final GetCurrentUuidUsecase getCurrentUidUsecase;
   AuthCubit({
     required this.singnOutUsecase,
     required this.isLoggedInUsecase,

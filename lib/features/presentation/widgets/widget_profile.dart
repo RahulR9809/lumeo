@@ -13,7 +13,14 @@ if(image==null){
   }else{
     return CachedNetworkImage(imageUrl: imageUrl,fit:BoxFit.cover,
     progressIndicatorBuilder: (context, url, downloadProgress) {
-      return Center(child: CircularProgressIndicator(),);
+      // return Center(child: CircularProgressIndicator(),);
+      return   Center(
+        child: Lottie.asset(
+          'assets/animation/new Animation.json',
+          width: 150,
+          height: 150,
+        ),
+      );
     },
        errorWidget: (context, url, error) => Image.asset(
           'assets/Png-removebg-preview.png',

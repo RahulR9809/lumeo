@@ -11,23 +11,20 @@ class UserEntity extends Equatable{
   final String? link;
   final String? email;
   final String? profileUrl;
-  // final String? postUrl;
    final String? videoUrl;
   final List? followers;
   final List? following;
   final num? totalFollowers;
-  final num? totalfollowing;
-  final num? totalPost;
+  final num? totalFollowing;
+  final num? totalPosts;
 
-// final File? postImage;
 final File? profileImageFile;
 final File? videoFile;
   final String? password;
   final String? otherUid;
 
   const UserEntity( {
-    //  this.postImage,
-    // this.postUrl,
+ 
     this.videoUrl,
     this.videoFile,
     this.profileImageFile,
@@ -41,10 +38,10 @@ final File? videoFile;
     this.followers,
     this.following,
     this.totalFollowers,
-    this.totalfollowing,
+    this.totalFollowing,
     this.password,
     this.otherUid,
-    this.totalPost,
+    this.totalPosts,
  } );
 
  @override
@@ -58,14 +55,12 @@ name,
     followers,
     following,
     totalFollowers,
-    totalfollowing,
+    totalFollowing,
     password,
     otherUid,
-    totalPost,
+    totalPosts,
  profileUrl,
-//  postUrl,
   videoUrl,
-  // postImage,
 profileImageFile,
 videoFile,
  ];

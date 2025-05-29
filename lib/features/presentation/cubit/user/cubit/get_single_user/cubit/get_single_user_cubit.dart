@@ -12,25 +12,7 @@ class GetSingleUserCubit extends Cubit<GetSingleUserState> {
   GetSingleUserCubit({required this.getSingleUserUsecase})
     : super(GetSingleUserInitial());
 
-  // Future<void> getSingleUser({required String uid}) async {
-  //   emit(GetSingleUserLoading());
-  //   try {
-  //     print('its entered');
-  //     final streamResponse = getSingleUserUsecase.call(uid);
-  //     streamResponse.listen((users) {
-  //       emit(GetSingleUserLoaded(user: users.first));
-  //       print('this is single user loaded');
-  //     });
-  //   } on SocketException catch (_) {
-  //     emit(GetSingleUserFailure());
-  //   } catch (e) {
-  //     emit(GetSingleUserFailure());
-  //   }
-  // }
-
-
-
-
+    
   Future<void> getSingleUser({required String uid}) async {
   emit(GetSingleUserLoading());
   print('State: GetSingleUserLoading');

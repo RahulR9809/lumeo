@@ -9,7 +9,7 @@ import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/domain/entities/post/post_entity.dart';
 import 'package:lumeo/features/presentation/cubit/post/cubit/post_cubit.dart';
 import 'package:lumeo/features/presentation/page/profile/widgets/profile_form_widget.dart';
-import 'package:lumeo/widget_profile.dart';
+import 'package:lumeo/features/presentation/widgets/widget_profile.dart';
 
 class UpdatePost extends StatefulWidget {
   final PostEntity post;

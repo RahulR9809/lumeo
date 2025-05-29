@@ -19,9 +19,20 @@ Widget sizeHor(double width) {
 class PageConst {
   static const String editProfilepage = "editProfilepage";
   static const String updatePost = "UpdatePost";
+  static const String updateCommentPage = "updateCommentPage";
   static const String commentPage = "commentPage";
   static const String loginPage = "LoginPage";
   static const String signUpPage = "SignUpPage";
+  static const String postDetailPage = "postDetailPage";
+  static const String singleProfilePage = "singleProfilePage";
+  static const String savedPostpage = "savedPostpage";
+  static const String followingPage = "followingPage";
+  static const String followersPage = "followersPage";
+    static const String chatPage = "chatPage";
+      static const String videoCallPage = "videoCallPage";
+  static const String userListPage = "userListPage";
+  static const String aboutPage = "aboutPage";
+
 }
 
 class FirebaseConst {
@@ -29,6 +40,9 @@ class FirebaseConst {
   static const String posts = "posts";
   static const String comment = "comment";
   static const String replay = "replay";
+    static const String chats = "chats";
+    static const String messages = "messages";
+
 }
 
 // void toast(String message){
@@ -45,7 +59,7 @@ class FirebaseConst {
 //     debugPrint("Toast message is null or empty, skipping.");
 //     return;
 //   }
-  
+
 //   Fluttertoast.showToast(
 //     msg: message,
 //     toastLength: Toast.LENGTH_SHORT,
@@ -56,8 +70,7 @@ class FirebaseConst {
 //   );
 // }
 
-
-
+const snackbar = SnackBar(content: Text('Post Saved'));
 
 void toast(String? message) {
   if (message == null || message.isEmpty) {

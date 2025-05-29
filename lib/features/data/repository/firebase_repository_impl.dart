@@ -3,7 +3,10 @@ import 'dart:io';
 
 import 'package:lumeo/features/data/data_sources/cloudinary/cludinary_data_source.dart';
 import 'package:lumeo/features/data/data_sources/remote_data_source/remote_data_source.dart';
+import 'package:lumeo/features/domain/entities/comment/comment_entity.dart';
 import 'package:lumeo/features/domain/entities/post/post_entity.dart';
+import 'package:lumeo/features/domain/entities/replay/replay_entity.dart';
+import 'package:lumeo/features/domain/entities/saved_post_entity/saved_post_entity.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/domain/repository/firebase_repository.dart';
 
@@ -85,6 +88,69 @@ Future<void> createUser(UserEntity user) async {
 
   @override
   Future<void> updatePost(PostEntity post)async =>firebaseRemoteDataSource.updatePost(post);
+
+
+//Comments
+
+  @override
+  Future<void> createComment(CommentEntity comment)async=>firebaseRemoteDataSource.createComment(comment);
+
+  @override
+  Future<void> deleteComment(CommentEntity comment)async=>firebaseRemoteDataSource.deleteComment(comment);
+
+  @override
+  Future<void> likeComment(CommentEntity comment)async=>firebaseRemoteDataSource.likeComment(comment);
+
+  @override
+  Stream<List<CommentEntity>> readComments(String postId)=>firebaseRemoteDataSource.readComments(postId);
+
+  @override
+  Future<void> updateComment(CommentEntity comment)async=>firebaseRemoteDataSource.updateComment(comment);
   
+  @override
+  Stream<List<PostEntity>> readSinglePosts(String postId)=>firebaseRemoteDataSource.readSinglePosts(postId);
+
+
+//replays
+
+  @override
+  Future<void> createReplays(ReplayEntity replay)async=>firebaseRemoteDataSource.createReplays(replay);
+
+  @override
+  Future<void> deleteReplays(ReplayEntity replay)async=>firebaseRemoteDataSource.deleteReplays(replay);
+  
+  
+  @override
+  Future<void> likeReplays(ReplayEntity replay)async=>firebaseRemoteDataSource.likeReplays(replay);
+
+  @override
+  Stream<List<ReplayEntity>> readReplays(ReplayEntity replay)=>firebaseRemoteDataSource.readReplays(replay);
+  @override
+  Future<void> updateReplays(ReplayEntity replay)async=>firebaseRemoteDataSource.updateReplays(replay);
+  
+  @override
+  Future<void> followUnfollowUser(UserEntity user)async=>firebaseRemoteDataSource.followUnfollowUser(user);
+  
+
+
+  @override
+  Future<void> savePost(String postId, String userId) =>
+      firebaseRemoteDataSource.savePost(postId, userId);
+
+  @override
+  Stream<List<SavedpostsEntity>> readsavedPost(String userId) {
+    return firebaseRemoteDataSource.readSavedPost(userId);
+  }
+  
+  @override
+  Future<void> deleteSavedPost(String postId, String userId)=>firebaseRemoteDataSource.deleteSavedPost(postId, userId);
+  
+  @override
+  Stream<List<UserEntity>> getSingleOtherUser(String otherUid)=>firebaseRemoteDataSource.getSingleOtherUser(otherUid);
+  
+  @override
+  Future<List<PostEntity>> likepage()=>firebaseRemoteDataSource.likepage();
+
+
 
 }
