@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
@@ -18,86 +19,106 @@ class _FollowersPageState extends State<FollowersPage> {
   @override
   Widget build(BuildContext context) {
     final followers = widget.user.followers;
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: backGroundColor,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        title: Text("Followers"),
-        backgroundColor: backGroundColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          "Followers",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.surface,
+            fontSize: width * 0.05,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.surface),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child:
-            followers == null || followers.isEmpty
-                ? const NoFollowersFollowing(
-                  text: "No Followers Yet",
-                  text2: "When someone follows you,\n you'll see them here.",
-                )
-                : Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: followers.length,
-                        itemBuilder: (context, index) {
-                          return StreamBuilder(
-                            stream: di.sl<GetSingleUserUsecase>().call(
-                              followers[index],
-                            ),
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) {
-                                return const Center(
-                                  child: CircularProgressIndicator(),
-                                );
-                              }
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.04,
+          vertical: height * 0.015,
+        ),
+        child: followers == null || followers.isEmpty
+            ? const NoFollowersFollowing(
+                text: "No Followers Yet",
+                text2: "When someone follows you,\n you'll see them here.",
+              )
+            : Column(
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: followers.length,
+                      itemBuilder: (context, index) {
+                        return StreamBuilder(
+                          stream: di.sl<GetSingleUserUsecase>().call(
+                                followers[index],
+                              ),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
 
-                              if (snapshot.data!.isEmpty) {
-                                return Container();
-                              }
+                            if (snapshot.data!.isEmpty) {
+                              return Container();
+                            }
 
-                              final singleUserData = snapshot.data!.first;
+                            final singleUserData = snapshot.data!.first;
 
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.pushNamed(
-                                      context,
-                                      PageConst.singleProfilePage,
-                                      arguments: singleUserData.uid,
-                                    );
-                                  },
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        height: 50,
-                                        width: 50,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            60,
-                                          ),
-                                          child: profilewidget(
-                                            imageUrl: singleUserData.profileUrl,
-                                          ),
+                            return Padding(
+                              padding: EdgeInsets.symmetric(
+                                vertical: height * 0.01,
+                              ),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    PageConst.singleProfilePage,
+                                    arguments: singleUserData.uid,
+                                  );
+                                },
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: width * 0.13,
+                                      width: width * 0.13,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(context).colorScheme.secondary,
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(60),
+                                        child: profilewidget(
+                                          imageUrl: singleUserData.profileUrl,
                                         ),
                                       ),
-                                      sizeHor(10),
-                                      Text(
+                                    ),
+                                    SizedBox(width: width * 0.04),
+                                    Expanded(
+                                      child: Text(
                                         singleUserData.username ?? '',
-                                        style: const TextStyle(fontSize: 16),
+                                        style: TextStyle(
+                                          fontSize: width * 0.045,
+                                          color: Theme.of(context).colorScheme.surface,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              );
-                            },
-                          );
-                        },
-                      ),
+                              ),
+                            );
+                          },
+                        );
+                      },
                     ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lumeo/features/domain/entities/comment/comment_entity.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/comment/create_comment_usecase.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/comment/delete_comment_usecase.dart';
@@ -63,7 +64,9 @@ Future<void>likeComment({required CommentEntity comment})async{
   }on SocketException catch(_){
     emit(CommentFailure());
   } catch(e){
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
 emit(CommentFailure());
   }
 }

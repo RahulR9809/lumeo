@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/user/get_single_other_usecase.dart';
 
@@ -25,7 +26,9 @@ class GetSingleOtherUserCubit extends Cubit<GetSingleOtherUserState> {
      
     );
   } catch (e) {
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
     emit(GetSingleOtherUserFailure());
   }
 }

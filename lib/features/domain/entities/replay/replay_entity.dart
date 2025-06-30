@@ -18,7 +18,7 @@ class ReplayEntity extends Equatable {
   final List<String>? likes;
   final Timestamp? createAt;
 
-  ReplayEntity(
+  const ReplayEntity(
   {  this.creatorUid,
     this.replayId,
     this.commentId,

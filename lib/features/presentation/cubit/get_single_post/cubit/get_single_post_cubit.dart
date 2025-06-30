@@ -14,37 +14,27 @@ class GetSinglePostCubit extends Cubit<GetSinglePostState> {
 
   Future<void> getSinglePost({required String postId}) async {
   emit(GetSinglePostLoading());
-  print('State: GetSingleUserLoading');
   
   try {
-    print('Entered try block');
     final streamResponse = readSinglePostUsecase.call(postId);
-print(streamResponse);
     streamResponse.listen(
       (users) {
-        print('Stream emitted: $users');
         if (users.isNotEmpty) {
-          print('State: GetSingleUserLoaded');
           emit(GetSinglePostLoaded(post: users.first));
         } else {
-          print('Stream emitted empty list');
           emit(GetSinglePostFailure());
         }
       },
       onError: (error) {
-        print('Stream error: $error');
         emit(GetSinglePostFailure());
       },
       onDone: () {
-        print('Stream closed');
       },
       cancelOnError: true,
     );
   } on SocketException catch (_) {
-    print('SocketException occurred');
     emit(GetSinglePostFailure());
   } catch (e) {
-    print('Exception occurred: $e');
     emit(GetSinglePostFailure());
   }
 }

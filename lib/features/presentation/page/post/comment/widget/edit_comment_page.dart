@@ -34,15 +34,15 @@ class _UpdateCommentPageState extends State<UpdateCommentPage> {
     final isMobile = width < 600;
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
-        title: const Text(
+        title:  Text(
           'Edit Comment',
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.surface),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme:  IconThemeData(color: Theme.of(context).colorScheme.surface),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : width * 0.2),
@@ -50,10 +50,10 @@ class _UpdateCommentPageState extends State<UpdateCommentPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            const Text(
+             Text(
               "Your Comment",
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.surface,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -62,12 +62,12 @@ class _UpdateCommentPageState extends State<UpdateCommentPage> {
             TextField(
               controller: _descriptionController,
               maxLines: 5,
-              style: const TextStyle(color: Colors.white),
+              style:  TextStyle(color: Theme.of(context).colorScheme.surface),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.grey[900],
+                fillColor: Theme.of(context).colorScheme.secondary,
                 hintText: "Edit your comment...",
-                hintStyle: TextStyle(color: Colors.grey[600]),
+                hintStyle: TextStyle(color:Theme.of(context).colorScheme.secondary),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -80,16 +80,16 @@ class _UpdateCommentPageState extends State<UpdateCommentPage> {
               height: 50,
               child: ElevatedButton.icon(
                 onPressed: _updateComment,
-                icon: const Icon(Icons.check, color: Colors.black),
-                label: const Text(
+                icon:  Icon(Icons.check, color: Theme.of(context).colorScheme.primary),
+                label:  Text(
                   "Update",
                   style: TextStyle(
-                    color: Colors.black,
+                    color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

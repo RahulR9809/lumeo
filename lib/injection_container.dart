@@ -29,6 +29,7 @@ import 'package:lumeo/features/domain/usecases/firebase_usecases/user/get_curren
 import 'package:lumeo/features/domain/usecases/firebase_usecases/user/get_single_other_usecase.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/user/get_single_user_usecase.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/user/get_users_usecase.dart';
+import 'package:lumeo/features/domain/usecases/firebase_usecases/user/google_signin_usecase.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/user/is_logged_in_usecase.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/user/log_in_user_usecase.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/user/sign_up_user_usecase.dart';
@@ -49,6 +50,7 @@ import 'package:lumeo/features/presentation/cubit/get_single_post/cubit/get_sing
 import 'package:lumeo/features/presentation/cubit/post/cubit/post_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/replay_cubit/replay_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/savedposts/savedpost_cubit.dart';
+import 'package:lumeo/features/presentation/cubit/theme/cubit/theme_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/user/cubit/get_single_user/cubit/get_single_user_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/user/cubit/user_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/user/get_single_other_user/cubit/get_single_other_user_cubit.dart';
@@ -62,7 +64,7 @@ Future<void> init() async {
     () => AuthCubit(
       singnOutUsecase: sl.call(),
       isLoggedInUsecase: sl.call(),
-      getCurrentUidUsecase: sl.call(),
+      getCurrentUidUsecase: sl.call(), googleSignInUsecase: sl.call(),
     ),
   );
 
@@ -85,6 +87,9 @@ Future<void> init() async {
   sl.registerFactory(
     () => GetSingleOtherUserCubit(getSingleOtherUsecase: sl.call()),
   );
+
+  sl.registerLazySingleton(
+      () => GoogleSignInUsecase(firebaseRepository: sl.call()));
 
   //post cubit injection
   sl.registerFactory(
@@ -150,6 +155,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => FollowUnfollowUsecase(repository: sl.call()));
   sl.registerLazySingleton(() => GetSingleOtherUsecase(repository: sl.call()));
 
+
+sl.registerFactory<ThemeCubit>(() => ThemeCubit());
 
 
   //cloudinary

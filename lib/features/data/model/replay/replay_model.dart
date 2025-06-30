@@ -21,7 +21,7 @@ class ReplayModel extends ReplayEntity {
   @override
   final String? replayId;
 
-   ReplayModel({
+   const ReplayModel({
     this.commentId,
     this.postId,
     this.creatorUid,

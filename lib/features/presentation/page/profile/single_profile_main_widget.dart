@@ -8,10 +8,8 @@ import 'package:lumeo/features/domain/usecases/firebase_usecases/user/get_curren
 import 'package:lumeo/features/presentation/cubit/auth/cubit/auth_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/current_uid/current_uid_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/post/cubit/post_cubit.dart';
-import 'package:lumeo/features/presentation/cubit/user/cubit/get_single_user/cubit/get_single_user_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/user/cubit/user_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/user/get_single_other_user/cubit/get_single_other_user_cubit.dart';
-import 'package:lumeo/features/presentation/page/profile/single_profile_main_widget.dart';
 import 'package:lumeo/features/presentation/widgets/bottom_container_widget.dart';
 import 'package:lumeo/features/presentation/widgets/widget_profile.dart';
 import 'package:lumeo/injection_container.dart' as di;
@@ -41,15 +39,27 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
     final currentUid = context.watch<CurrentUidCubit>().state;
     return BlocBuilder<GetSingleOtherUserCubit, GetSingleOtherUserState>(
       builder: (context, getSingleOtherUserLoaded) {
         if (getSingleOtherUserLoaded is GetSingleOtherUserLoaded) {
           final singleuser = getSingleOtherUserLoaded.otherUser;
           return Scaffold(
-            appBar: AppBar(),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            appBar: AppBar(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.surface),
+              ),
+            ),
             body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: width * 0.03),
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,9 +69,10 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
                       children: [
                         Text(
                           "${singleuser.username}",
-                          style: const TextStyle(
-                            fontSize: 20,
+                          style: TextStyle(
+                            fontSize: width * 0.05,
                             fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.surface,
                           ),
                         ),
                         currentUid == singleuser.uid
@@ -76,11 +87,11 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
                             : const SizedBox.shrink(),
                       ],
                     ),
-                    sizeVer(10),
+                    sizeVer(height * 0.01),
                     Row(
                       children: [
                         CircleAvatar(
-                          radius: 40,
+                          radius: width * 0.1,
                           backgroundColor: const Color.fromARGB(
                             255,
                             83,
@@ -89,16 +100,15 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
                           ),
                           child: ClipOval(
                             child: SizedBox(
-                              width: 80,
-                              height: 80,
+                              width: width * 0.2,
+                              height: width * 0.2,
                               child: profilewidget(
                                 imageUrl: singleuser.profileUrl,
                               ),
                             ),
                           ),
                         ),
-
-                        const SizedBox(width: 20),
+                        SizedBox(width: width * 0.05),
                         Expanded(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -120,25 +130,32 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
                         ),
                       ],
                     ),
-                    sizeVer(10),
+                    sizeVer(height * 0.015),
                     Text(
                       '${singleuser.name == "" ? singleuser.username : singleuser.name}',
-                      style: const TextStyle(
-                        fontSize: 14,
+                      style: TextStyle(
+                        fontSize: width * 0.035,
                         fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.surface,
                       ),
                     ),
                     Text(
                       ' ${singleuser.bio}',
-                      style: const TextStyle(fontSize: 13),
+                      style: TextStyle(
+                        fontSize: width * 0.032,
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
                     ),
                     Text(
                       singleuser.link ?? '',
-                      style: TextStyle(fontSize: 13, color: Colors.blue),
+                      style: TextStyle(
+                        fontSize: width * 0.032,
+                        color: Colors.blue,
+                      ),
                     ),
-                    sizeVer(10),
+                    sizeVer(height * 0.015),
                     currentUid == singleuser.uid
-                        ? const SizedBox(height: 30, width: 30)
+                        ? SizedBox(height: width * 0.05, width: width * 0.05)
                         : BottomContainerWidget(
                           text:
                               singleuser.followers!.contains(currentUid)
@@ -146,7 +163,7 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
                                   : "Follow",
                           color:
                               singleuser.followers!.contains(currentUid)
-                                  ? secondaryColor
+                                  ? Theme.of(context).colorScheme.secondary
                                   : blueColor,
                           onTapListener: () {
                             BlocProvider.of<UserCubit>(context).followUser(
@@ -155,10 +172,9 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
                                 otherUid: widget.otherUserId,
                               ),
                             );
-                  
                           },
                         ),
-                    sizeVer(10),
+                    sizeVer(height * 0.015),
                     BlocBuilder<PostCubit, PostState>(
                       builder: (context, poststate) {
                         if (poststate is PostLoaded) {
@@ -181,16 +197,25 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
                                 ),
                             itemBuilder: (context, index) {
                               return SizedBox(
-                                height: 30,
-                                width: 30,
-                                child: profilewidget(
-                                  imageUrl: posts[index].postImageUrl,
+                                width: width * 0.3,
+                                height: width * 0.3,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      PageConst.postDetailPage,
+                                      arguments: posts[index].postId,
+                                    );
+                                  },
+                                  child: profilewidget(
+                                    imageUrl: posts[index].postImageUrl,
+                                  ),
                                 ),
                               );
                             },
                           );
                         }
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       },
                     ),
                   ],
@@ -199,7 +224,7 @@ class _SingleProfileMainWidgetState extends State<SingleProfileMainWidget> {
             ),
           );
         }
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -258,9 +283,13 @@ class _ProfileStat extends StatelessWidget {
       children: [
         Text(
           count,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style:  TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.surface,
+          ),
         ),
-        Text(label, style: const TextStyle(fontSize: 14)),
+        Text(label, style:  TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.surface)),
       ],
     );
   }
@@ -272,7 +301,7 @@ _openbottomModelSheet(context, currentUser) {
     builder: (context) {
       return Container(
         height: 180,
-        color: backGroundColor,
+        color: Theme.of(context).colorScheme.primary,
         child: Column(
           children: [
             sizeVer(10),
@@ -281,7 +310,7 @@ _openbottomModelSheet(context, currentUser) {
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             sizeVer(10),
-            const Divider(color: secondaryColor),
+             Divider(color: Theme.of(context).colorScheme.secondary),
             GestureDetector(
               onTap:
                   () => Navigator.pushNamed(
@@ -292,14 +321,14 @@ _openbottomModelSheet(context, currentUser) {
               child: const Text('Edit profile'),
             ),
             sizeVer(10),
-            const Divider(color: secondaryColor),
+             Divider(color: Theme.of(context).colorScheme.secondary),
             GestureDetector(
               onTap:
                   () => Navigator.pushNamed(context, PageConst.savedPostpage),
               child: const Text('Saved Posts'),
             ),
             sizeVer(10),
-            const Divider(color: secondaryColor),
+             Divider(color: Theme.of(context).colorScheme.secondary),
             InkWell(
               onTap: () async {
                 logOut(context);

@@ -10,6 +10,7 @@ abstract class FirebaseRemoteDataSource {
   Future<void> signUpUser(UserEntity user);
   Future<bool> isSignIn();
   Future<void> signOut();
+    Future<String> googleSignIn();
   Future<void> createUserWithProfileImage(UserEntity user, String profileUrl);
   //user
   Stream<List<UserEntity>> getUsers(UserEntity user);

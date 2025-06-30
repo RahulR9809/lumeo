@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
@@ -18,15 +19,28 @@ class _FollowingPageState extends State<FollowingPage> {
   @override
   Widget build(BuildContext context) {
     final following = widget.user.following;
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: backGroundColor,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        title: const Text("Following"),
-        backgroundColor: backGroundColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        title: Text(
+          "Following",
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.surface,
+            fontSize: width * 0.05,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.surface),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.04,
+          vertical: height * 0.015,
+        ),
         child: following == null || following.isEmpty
             ? const NoFollowersFollowing(
                 text: "No Following Yet",
@@ -39,10 +53,14 @@ class _FollowingPageState extends State<FollowingPage> {
                       itemCount: following.length,
                       itemBuilder: (context, index) {
                         return StreamBuilder(
-                          stream: di.sl<GetSingleUserUsecase>().call(following[index]),
+                          stream: di.sl<GetSingleUserUsecase>().call(
+                                following[index],
+                              ),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
                             }
 
                             if (snapshot.data!.isEmpty) {
@@ -52,16 +70,26 @@ class _FollowingPageState extends State<FollowingPage> {
                             final singleUserData = snapshot.data!.first;
 
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              padding: EdgeInsets.symmetric(
+                                vertical: height * 0.01,
+                              ),
                               child: GestureDetector(
-                                onTap: (){
-                                  Navigator.pushNamed(context, PageConst.singleProfilePage,arguments:singleUserData.uid );
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                    context,
+                                    PageConst.singleProfilePage,
+                                    arguments: singleUserData.uid,
+                                  );
                                 },
                                 child: Row(
                                   children: [
-                                    SizedBox(
-                                      height: 50,
-                                      width: 50,
+                                    Container(
+                                      height: width * 0.13,
+                                      width: width * 0.13,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(context).colorScheme.secondary,
+                                      ),
                                       child: ClipRRect(
                                         borderRadius: BorderRadius.circular(60),
                                         child: profilewidget(
@@ -69,10 +97,16 @@ class _FollowingPageState extends State<FollowingPage> {
                                         ),
                                       ),
                                     ),
-                                    sizeHor(10),
-                                    Text(
-                                      singleUserData.username ?? '',
-                                      style: const TextStyle(fontSize: 16),
+                                    SizedBox(width: width * 0.04),
+                                    Expanded(
+                                      child: Text(
+                                        singleUserData.username ?? '',
+                                        style: TextStyle(
+                                          fontSize: width * 0.045,
+                                          color: Theme.of(context).colorScheme.surface,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),

@@ -1,6 +1,7 @@
 
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:lumeo/features/data/data_sources/cloudinary/cludinary_data_source.dart';
 import 'package:lumeo/features/data/data_sources/remote_data_source/remote_data_source.dart';
 import 'package:lumeo/features/domain/entities/comment/comment_entity.dart';
@@ -23,12 +24,18 @@ final CloudinaryRepository cloudinaryRepository;
 
 @override
 Future<void> createUser(UserEntity user) async {
-  print("Creating user with UID: ${user.uid}"); // Log the user UID or other details
+  if (kDebugMode) {
+    print("Creating user with UID: ${user.uid}");
+  } // Log the user UID or other details
   try {
     await firebaseRemoteDataSource.createUser(user);
-    print("User successfully created with UID: ${user.uid}"); // Log success
+    if (kDebugMode) {
+      print("User successfully created with UID: ${user.uid}");
+    } // Log success
   } catch (e) {
-    print("Error creating user: $e"); // Log error if any
+    if (kDebugMode) {
+      print("Error creating user: $e");
+    } // Log error if any
   }
 }
 
@@ -150,6 +157,9 @@ Future<void> createUser(UserEntity user) async {
   
   @override
   Future<List<PostEntity>> likepage()=>firebaseRemoteDataSource.likepage();
+  
+  @override
+  Future<String> googleSignIn()async=>firebaseRemoteDataSource.googleSignIn();
 
 
 

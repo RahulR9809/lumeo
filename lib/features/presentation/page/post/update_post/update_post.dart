@@ -2,6 +2,7 @@
 
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -40,6 +41,7 @@ class _UpdatePostState extends State<UpdatePost> {
 
   Future selectImage() async {
     try {
+      // ignore: invalid_use_of_visible_for_testing_member
       final pickedFile = await ImagePicker.platform.getImageFromSource(
         source: ImageSource.gallery,
       );
@@ -47,30 +49,36 @@ class _UpdatePostState extends State<UpdatePost> {
         if (pickedFile != null) {
           _postImage = File(pickedFile.path);
         } else {
-          print('no image has been selected');
+          if (kDebugMode) {
+            print('no image has been selected');
+          }
         }
       });
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 
   bool _isUpdating = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
         centerTitle: true,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(Icons.arrow_back, color: Colors.white),
+          child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.surface),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         title: Text(
           "Edit Post",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+          style: TextStyle(color: Theme.of(context).colorScheme.surface, fontWeight: FontWeight.w500),
         ),
         actions: [
           Padding(
@@ -79,7 +87,7 @@ class _UpdatePostState extends State<UpdatePost> {
               onTap: () {
                 _updatePost();
               },
-              child: Icon(Icons.done, color: Colors.grey[300], size: 25),
+              child: Icon(Icons.done, color: Theme.of(context).colorScheme.surface, size: 25),
             ),
           ),
         ],
@@ -94,11 +102,11 @@ class _UpdatePostState extends State<UpdatePost> {
                   height: 100,
                   width: 100,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade800, width: 2),
+                    border: Border.all(color: darkGreyColor, width: 2),
                     borderRadius: BorderRadius.circular(50),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.shade900,
+                        color: Theme.of(context).colorScheme.primary,
                         blurRadius: 10,
                         offset: Offset(0, 4),
                       ),
@@ -121,7 +129,7 @@ class _UpdatePostState extends State<UpdatePost> {
               Text(
                 "${widget.post.userName}",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -132,7 +140,7 @@ class _UpdatePostState extends State<UpdatePost> {
                 height: 200,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.grey.shade800, width: 1),
+                  border: Border.all(color: darkGreyColor, width: 1),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.shade900,
@@ -163,9 +171,9 @@ class _UpdatePostState extends State<UpdatePost> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade900,
+                  color: Theme.of(context).colorScheme.primary,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade700),
+                  border: Border.all(color: darkGreyColor),
                 ),
                 child: ProfileFormWidget(
                   title: "Discription",
@@ -177,7 +185,7 @@ class _UpdatePostState extends State<UpdatePost> {
                   ? Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text("Updating...", style: TextStyle(color: whiteColor)),
+                      Text("Updating...", style: TextStyle(color: Theme.of(context).colorScheme.surface)),
                       sizeHor(10),
                       CircularProgressIndicator(),
                     ],

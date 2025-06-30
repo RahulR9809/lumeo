@@ -1,7 +1,5 @@
 
 import 'dart:io';
-
-import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/domain/repository/firebase_repository.dart';
 
 class UploadVideoToStorageUseCase {

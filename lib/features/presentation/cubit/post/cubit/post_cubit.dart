@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lumeo/features/domain/entities/post/post_entity.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/posts/create_post_usecase.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/posts/delete_post_usecase.dart';
@@ -59,7 +60,9 @@ Future<void>likePost({required PostEntity post})async{
   }on SocketException catch(_){
     emit(PostFailure());
   } catch(e){
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
 emit(PostFailure());
   }
 }

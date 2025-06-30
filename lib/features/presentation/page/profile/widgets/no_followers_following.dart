@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class NoFollowersFollowing extends StatelessWidget {
@@ -7,38 +8,45 @@ class NoFollowersFollowing extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
     return Center(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        padding: EdgeInsets.symmetric(
+          horizontal: width * 0.06,
+          vertical: height * 0.05,
+        ),
         decoration: BoxDecoration(
           color: Colors.black,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(width * 0.04),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               Icons.person_off_outlined,
-              size: 64,
+              size: width * 0.15,
               color: Colors.white,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             Text(
               text,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 22,
+                fontSize: width * 0.06,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
               ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: height * 0.012),
             Text(
               text2,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white70,
-                fontSize: 14,
+                fontSize: width * 0.035,
                 height: 1.5,
               ),
             ),

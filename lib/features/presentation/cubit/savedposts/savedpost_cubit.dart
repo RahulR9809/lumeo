@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lumeo/features/domain/entities/post/post_entity.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/posts/read_post_usecase.dart';
@@ -39,7 +40,9 @@ class SavedpostCubit extends Cubit<SavedpostState> {
     } on SocketException catch (_) {
       emit(SavedPostFailure());
     } catch (e) {
-      print(e);
+      if (kDebugMode) {
+        print(e);
+      }
       emit(SavedPostFailure());
     }
   }

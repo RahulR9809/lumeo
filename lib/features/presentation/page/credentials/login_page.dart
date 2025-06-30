@@ -4,8 +4,10 @@ import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/presentation/cubit/auth/cubit/auth_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/credential/cubit/credential_cubit.dart';
 import 'package:lumeo/features/presentation/page/credentials/main_screen/main_screen.dart';
+import 'package:lumeo/features/presentation/page/credentials/widget/google_button.dart';
 import 'package:lumeo/features/presentation/widgets/button_widget.dart';
 import 'package:lumeo/features/presentation/widgets/form_container_widget.dart';
+import 'package:lumeo/validator.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -17,6 +19,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _hasAttemptedLogin = false;
 
   bool _isLogIn = false;
 
@@ -30,27 +33,29 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backGroundColor,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       body: BlocConsumer<CredentialCubit, CredentialState>(
         listener: (context, credentialState) {
           if (credentialState is CredentialSuccess) {
             BlocProvider.of<AuthCubit>(context).loggedIn();
           }
           if (credentialState is CredentialFailure) {
-            toast("Invalid Email and password");
+            _showErrorSnackBar("incorect email or password");
           }
         },
         builder: (context, credentialState) {
-          print(credentialState);
           if (credentialState is CredentialSuccess) {
             return BlocBuilder<AuthCubit, AuthState>(
+        
               builder: (context, authState) {
                 if (authState is Authenticated) {
-                  print(authState);
                   return MainScreen(uid: authState.uid);
-                } else {
-                  return _bodyWidget();
+                } else if (authState is UnAuthenticated && _hasAttemptedLogin) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _showErrorSnackBar("incorrect email or password");
+                  });
                 }
+                return _bodyWidget();
               },
             );
           }
@@ -59,35 +64,44 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
-
   _bodyWidget() {
-   return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+  final size = MediaQuery.of(context).size;
+  final height = size.height;
+  final width = size.width;
+
+  return SingleChildScrollView(
+    child: Padding(
+      padding: EdgeInsets.symmetric(horizontal: width * 0.05, vertical: height * 0.2),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Flexible(child: Container(), flex: 4),
-          Center(
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/logo.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
+         Center(
+  child: SizedBox(
+    width: width * 0.30,
+    height: width * 0.25,
+    child: Image.asset(
+      Theme.of(context).brightness == Brightness.dark
+          ? 'assets/dark_logo-removebg-preview.png'
+          : 'assets/white_logo-removebg-preview.png',
+      fit: BoxFit.contain,
+      height: 60,
+    ),
+  ),
+),
+
+          SizedBox(height: height * 0.015),
+          FormContainerWidget(
+            hintText: "Email",
+            controller: _emailController,
           ),
-          sizeVer(10),
-          FormContainerWidget(hintText: "Email", controller: _emailController),
-          sizeVer(20),
+          SizedBox(height: height * 0.025),
           FormContainerWidget(
             hintText: "Password",
             isPasswordField: true,
             controller: _passwordController,
           ),
-          sizeVer(20),
+          SizedBox(height: height * 0.025),
           ButtonWidget(
             color: blueColor,
             onTapListener: () {
@@ -95,35 +109,42 @@ class _LoginPageState extends State<LoginPage> {
             },
             text: "Login",
           ),
-          sizeVer(10),
-          _isLogIn == true
-              ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Please wait",
-                    style: TextStyle(
-                      color: whiteColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
+          SizedBox(height: height * 0.015),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, 'forgotPasswordPage'),
+                child: Text(
+                  'Forgot Password?',
+                  style: TextStyle(
+                    color: blueColor,
+                    fontWeight: FontWeight.w400,
+                    fontSize: width * 0.03,
                   ),
-                  sizeVer(10),
-                  CircularProgressIndicator(),
-                ],
-              )
-              : Container(width: 0, height: 0),
-          Flexible(child: Container(), flex: 2),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: height * 0.015),
+          const Text('or'),
+          SizedBox(height: height * 0.02),
+          GoogleButton(
+            text: 'Sign in with Google',
+            color: Theme.of(context).colorScheme.primary,
+            onTapListener: () {
+              BlocProvider.of<AuthCubit>(context).googleSignIn();
+            },
+          ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 50),
+            padding: EdgeInsets.symmetric(vertical: height * 0.05),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "if you dont have an account?",
-                  style: TextStyle(color: whiteColor),
+                  "If you don't have an account? ",
+                  style: TextStyle(color: Theme.of(context).colorScheme.surface, fontSize: width * 0.035),
                 ),
-
                 InkWell(
                   onTap: () {
                     Navigator.pushNamedAndRemoveUntil(
@@ -133,25 +154,64 @@ class _LoginPageState extends State<LoginPage> {
                     );
                   },
                   child: Text(
-                    "signUp",
+                    "SignUp",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: whiteColor,
+                      color: Theme.of(context).colorScheme.surface,
+                      fontSize: width * 0.035,
                     ),
                   ),
                 ),
               ],
             ),
           ),
+          _isLogIn
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Please wait",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.surface,
+                        fontSize: width * 0.04,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    SizedBox(width: width * 0.03),
+                    SizedBox(
+                      width: width * 0.05,
+                      height: width * 0.05,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ],
+                )
+              : SizedBox.shrink(),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _logInUser() {
+    final emailError = Validators.email(_emailController.text);
+    final passwordError = Validators.password(_passwordController.text);
+
+    if (emailError != null) {
+      _showErrorSnackBar(emailError);
+      return;
+    }
+
+    if (passwordError != null) {
+      _showErrorSnackBar(passwordError);
+      return;
+    }
+
     setState(() {
+      _hasAttemptedLogin = true;
+
       _isLogIn = true;
     });
+
     BlocProvider.of<CredentialCubit>(context)
         .sigInUser(
           email: _emailController.text,
@@ -164,5 +224,11 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.clear();
     _passwordController.clear();
     _isLogIn = false;
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
   }
 }

@@ -4,11 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/domain/entities/app_entities/app_entites.dart';
 import 'package:lumeo/features/domain/entities/comment/comment_entity.dart';
-import 'package:lumeo/features/domain/entities/replay/replay_entity.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/presentation/cubit/comment/comment_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/get_single_post/cubit/get_single_post_cubit.dart';
-import 'package:lumeo/features/presentation/cubit/replay_cubit/replay_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/user/cubit/get_single_user/cubit/get_single_user_cubit.dart';
 import 'package:lumeo/features/presentation/page/post/comment/widget/single_comment_widget.dart';
 import 'package:lumeo/features/presentation/widgets/widget_profile.dart';
@@ -24,7 +22,6 @@ class CommentPage extends StatefulWidget {
 
 class _CommentPageState extends State<CommentPage> {
   final TextEditingController _commentController = TextEditingController();
-  bool _isUserReplaying = false;
   @override
   void dispose() {
     _commentController.dispose();
@@ -49,31 +46,36 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: primaryColor,
-      appBar: AppBar(
-        backgroundColor: primaryColor,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(Icons.arrow_back, color: whiteColor),
-        ),
-        centerTitle: true,
-        title: Text("Comments", style: TextStyle(color: whiteColor)),
+Widget build(BuildContext context) {
+  final width = MediaQuery.of(context).size.width;
+  final height = MediaQuery.of(context).size.height;
+
+  return Scaffold(
+    backgroundColor: Theme.of(context).colorScheme.primary,
+    appBar: AppBar(
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      leading: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.surface),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: BlocBuilder<GetSingleUserCubit, GetSingleUserState>(
-          builder: (context, singleUserState) {
-            if (singleUserState is GetSingleUserLoaded) {
-              final singeluser = singleUserState.user;
-              return BlocBuilder<GetSinglePostCubit, GetSinglePostState>(
-                builder: (context,singlePostState) {
-                  if(singlePostState is GetSinglePostLoaded){
-                    final singlePost=singlePostState.post;
- return BlocBuilder<CommentCubit, CommentState>(
+      centerTitle: true,
+      title: Text("Comments", style: TextStyle(color: Theme.of(context).colorScheme.surface, fontSize: width * 0.05)),
+    ),
+    body: Padding(
+      padding: EdgeInsets.symmetric(horizontal: width * 0.03, vertical: height * 0.015),
+      child: BlocBuilder<GetSingleUserCubit, GetSingleUserState>(
+        builder: (context, singleUserState) {
+          if (singleUserState is GetSingleUserLoaded) {
+            final singeluser = singleUserState.user;
+
+            return BlocBuilder<GetSinglePostCubit, GetSinglePostState>(
+              builder: (context, singlePostState) {
+                if (singlePostState is GetSinglePostLoaded) {
+                  final singlePost = singlePostState.post;
+
+                  return BlocBuilder<CommentCubit, CommentState>(
                     builder: (context, commentState) {
                       if (commentState is CommentLoaded) {
                         return Column(
@@ -81,120 +83,116 @@ class _CommentPageState extends State<CommentPage> {
                           children: [
                             Row(
                               children: [
-                                Container(
-                                  width: 50,
-                                  height: 50,
-                                 child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: 
-                                  profilewidget(imageUrl: singlePost.userProfileUrl),
-                                 ),
+                                SizedBox(
+                                  width: width * 0.13,
+                                  height: width * 0.13,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(width * 0.065),
+                                    child: profilewidget(imageUrl: singlePost.userProfileUrl),
+                                  ),
                                 ),
-                                sizeHor(10),
+                                sizeHor(width * 0.03),
                                 Text(
                                   "${singlePost.userName}",
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: width * 0.045,
                                     fontWeight: FontWeight.bold,
-                                    color: whiteColor,
+                                    color: Theme.of(context).colorScheme.surface,
                                   ),
                                 ),
                               ],
                             ),
-                            sizeVer(10),
+                            sizeVer(height * 0.01),
                             Text(
                               "${singlePost.description}",
                               style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: whiteColor,
+                                fontSize: width * 0.04,
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.surface,
                               ),
                             ),
-                            sizeVer(10),
-                            Divider(thickness: 1, color: secondaryColor),
-                            sizeVer(10),
+                            sizeVer(height * 0.02),
+                            Divider(thickness: 1, color: Theme.of(context).colorScheme.secondary),
+                            sizeVer(height * 0.015),
                             Expanded(
                               child: ListView.builder(
                                 itemCount: commentState.comments.length,
                                 itemBuilder: (context, index) {
-                                  final singlComment =
-                                      commentState.comments[index];
+                                  final singleComment = commentState.comments[index];
                                   return SingleCommentWidget(
                                     currentUser: singeluser,
-                                    comment: singlComment,
+                                    comment: singleComment,
                                     onLongPressListner: () {
                                       _openBottomModelSheet(
                                         context,
-                                        commentState.comments[index],
+                                        singleComment,
                                         widget.appEntites.postId!,
                                       );
                                     },
                                     onLikeClickListner: () {
-                                      _LikeComment(
-                                        commentState.comments[index],
-                                      );
+                                      _LikeComment(singleComment);
                                     },
                                   );
                                 },
                               ),
                             ),
-                            _commentSection(currentUser: singeluser),
+                            _commentSection(currentUser: singeluser, width: width, height: height),
                           ],
                         );
                       }
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     },
                   );
-                  }
-                             return Center(child: CircularProgressIndicator());
+                }
+                return const Center(child: CircularProgressIndicator());
+              },
+            );
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+      ),
+    ),
+  );
+}
 
-                },
-              );
-            }
-            return Center(child: CircularProgressIndicator());
-          },
+  Widget _commentSection({required UserEntity currentUser, required double width, required double height}) {
+  return Container(
+    width: double.infinity,
+    height: height * 0.065,
+    margin: EdgeInsets.symmetric(horizontal: width * 0.01),
+    padding: EdgeInsets.symmetric(horizontal: width * 0.03),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.secondary,
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Row(
+      children: [
+        sizeHor(width * 0.02),
+        Expanded(
+          child: TextFormField(
+            controller: _commentController,
+            style: TextStyle(color: Theme.of(context).colorScheme.surface),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: "Post your comment...",
+              hintStyle: TextStyle(color: Theme.of(context).colorScheme.surface, fontSize: width * 0.035),
+            ),
+          ),
         ),
-      ),
-    );
-  }
+        GestureDetector(
+          onTap: () {
+            _createComment(currentUser);
+          },
+          child: Text(
+            "Post",
+            style: TextStyle(fontSize: width * 0.04, color: blueColor),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 
-  _commentSection({required UserEntity currentUser}) {
-    return Container(
-      width: double.infinity,
-      height: 55,
-      margin: EdgeInsets.symmetric(horizontal: 5),
-      padding: EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: darkGreyColor,
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Row(
-        children: [
-          sizeHor(10),
-          Expanded(
-            child: TextFormField(
-              controller: _commentController,
-              style: TextStyle(color: whiteColor),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: "Post your comment...",
-                hintStyle: TextStyle(color: whiteColor),
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              _createComment(currentUser);
-            },
-            child: Text(
-              "Post",
-              style: TextStyle(fontSize: 15, color: blueColor),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   _createComment(UserEntity currentUser) {
     BlocProvider.of<CommentCubit>(context)
@@ -226,7 +224,7 @@ class _CommentPageState extends State<CommentPage> {
       builder: (context) {
         return Container(
           height: 150,
-          decoration: BoxDecoration(color: backGroundColor),
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -237,12 +235,12 @@ class _CommentPageState extends State<CommentPage> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
-                    color: whiteColor,
+                    color: Theme.of(context).colorScheme.surface,
                   ),
                 ),
               ),
               sizeVer(5),
-              Divider(thickness: 1, color: secondaryColor),
+              Divider(thickness: 1, color: Theme.of(context).colorScheme.secondary),
               sizeVer(5),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
@@ -255,13 +253,13 @@ class _CommentPageState extends State<CommentPage> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: whiteColor,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                 ),
               ),
               sizeVer(5),
-              Divider(thickness: 1, color: secondaryColor),
+              Divider(thickness: 1, color: Theme.of(context).colorScheme.secondary),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: GestureDetector(
@@ -277,7 +275,7 @@ class _CommentPageState extends State<CommentPage> {
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
-                      color: whiteColor,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                 ),

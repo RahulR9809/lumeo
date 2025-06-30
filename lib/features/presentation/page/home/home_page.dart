@@ -20,27 +20,33 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primaryColor,
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
-        backgroundColor: backGroundColor,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Image.asset("assets/logo.png", height: 60),
+              Image.asset(
+    Theme.of(context).brightness == Brightness.dark
+        ? 'assets/dark_logo-removebg-preview.png'
+        : 'assets/white_logo-removebg-preview.png',
+    height: 60,
+  ),
+
             GestureDetector(
               onTap: (){
                 Navigator.push(context, MaterialPageRoute(builder: (context)=>Userlistpage()));
               },
-              child: Icon(MdiIcons.facebookMessenger, color: whiteColor, size: 28)),
+              child: Icon(MdiIcons.facebookMessenger, color: Theme.of(context).colorScheme.surface, size: 28)),
           ],
         ),
       ),
+
       body: BlocProvider<PostCubit>(
         create: (context) => di.sl<PostCubit>()..getPosts(post: PostEntity()),
         child: BlocBuilder<PostCubit, PostState>(
           builder: (context, poststate) {
-            print(poststate);
             if (poststate is PostLoading) {
               // return Center(child: CircularProgressIndicator());
               return  Center(
@@ -95,7 +101,7 @@ class _HomePageState extends State<HomePage> {
             'No Posts Found',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
 
@@ -105,7 +111,7 @@ class _HomePageState extends State<HomePage> {
             'Looks like there’s nothing to show here right now.\nTry creating a new post!',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
+              color: Theme.of(context).colorScheme.secondary,
             ),
           ),
 

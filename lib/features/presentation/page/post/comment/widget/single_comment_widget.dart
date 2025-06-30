@@ -33,7 +33,7 @@ class SingleCommentWidget extends StatefulWidget {
 
 class _SingleCommentWidgetState extends State<SingleCommentWidget> {
   bool _isUserReplaying = false;
-  TextEditingController _replayDescriptionController = TextEditingController();
+  final TextEditingController _replayDescriptionController = TextEditingController();
   String? _currentUid;
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _SingleCommentWidgetState extends State<SingleCommentWidget> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
+          SizedBox(
             height: 35,
             width: 35,
             child: ClipRRect(
@@ -82,7 +82,7 @@ class _SingleCommentWidgetState extends State<SingleCommentWidget> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: whiteColor,
+                          color: Theme.of(context).colorScheme.surface,
                         ),
                       ),
                       GestureDetector(
@@ -97,7 +97,7 @@ class _SingleCommentWidgetState extends State<SingleCommentWidget> {
                           color:
                               widget.comment.likes!.contains(_currentUid)
                                   ? Colors.red
-                                  : whiteColor,
+                                  : Theme.of(context).colorScheme.surface,
                         ),
                       ),
                     ],
@@ -107,7 +107,7 @@ class _SingleCommentWidgetState extends State<SingleCommentWidget> {
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: secondaryColor,
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
 
@@ -115,10 +115,10 @@ class _SingleCommentWidgetState extends State<SingleCommentWidget> {
                   Row(
                     children: [
                       Text(
-                        "${DateFormat("dd/MM/yyy").format(widget.comment.createAt!.toDate())}",
+                        DateFormat("dd/MM/yyy").format(widget.comment.createAt!.toDate()),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: darkGreyColor,
+                          color: Theme.of(context).colorScheme.secondary,
                         ),
                       ),
                       sizeHor(20),
@@ -132,7 +132,7 @@ class _SingleCommentWidgetState extends State<SingleCommentWidget> {
                           "replay",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: darkGreyColor,
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
                         ),
                       ),
@@ -151,7 +151,7 @@ class _SingleCommentWidgetState extends State<SingleCommentWidget> {
                           "view replays",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: darkGreyColor,
+                            color: Theme.of(context).colorScheme.secondary,
                           ),
                         ),
                       ),
@@ -214,7 +214,7 @@ class _SingleCommentWidgetState extends State<SingleCommentWidget> {
                           ),
                         ],
                       )
-                      : Container(width: 0, height: 0),
+                      : SizedBox(width: 0, height: 0),
                 ],
               ),
             ),

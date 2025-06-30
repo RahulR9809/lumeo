@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -39,6 +40,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   Future selectImage() async {
     try {
+      // ignore: invalid_use_of_visible_for_testing_member
       final pickedFile = await ImagePicker.platform.getImageFromSource(
         source: ImageSource.gallery,
       );
@@ -46,104 +48,136 @@ class _EditProfilePageState extends State<EditProfilePage> {
         if (pickedFile != null) {
           _profileImage = File(pickedFile.path);
         } else {
-          print('no image has been selected');
+          if (kDebugMode) {
+            print('no image has been selected');
+          }
         }
       });
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) {
+            print(e);
+          }
+    }
   }
 
   bool _isUpdating = false;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: primaryColor,
-      appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: primaryColor,
-        title: Text("Edit profile", style: TextStyle(color: whiteColor)),
-        leading: GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Icon(Icons.close, color: whiteColor),
+
+@override
+Widget build(BuildContext context) {
+  final width = MediaQuery.of(context).size.width;
+  final height = MediaQuery.of(context).size.height;
+
+  return Scaffold(
+    backgroundColor: Theme.of(context).colorScheme.primary,
+    appBar: AppBar(
+      centerTitle: true,
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      title: Text(
+        "Edit profile",
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.surface,
+          fontSize: width * 0.05,
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: GestureDetector(
-              onTap: _updateUserProfile,
-              child: Icon(Icons.done, color: blueColor),
-            ),
-          ),
-        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Center(
-                child: ClipOval(
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(60),
-                      color: secondaryColor,
-                    ),
-                    child:
-                        _profileImage == null
-                            ? profilewidget(
-                              imageUrl: widget.currentUser.profileUrl,
-                            )
-                            : Image.file(_profileImage!, fit: BoxFit.cover),
+      leading: GestureDetector(
+        onTap: () => Navigator.pop(context),
+        child: Icon(Icons.close, color: Theme.of(context).colorScheme.surface, size: width * 0.06),
+      ),
+      actions: [
+        Padding(
+          padding: EdgeInsets.only(right: width * 0.03),
+          child: GestureDetector(
+            onTap: _updateUserProfile,
+            child: Icon(Icons.done, color: blueColor, size: width * 0.065),
+          ),
+        ),
+      ],
+    ),
+    body: Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: width * 0.03,
+        vertical: height * 0.015,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Center(
+              child: ClipOval(
+                child: Container(
+                  width: width * 0.3,
+                  height: width * 0.3,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(width * 0.15),
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  child: _profileImage == null
+                      ? profilewidget(imageUrl: widget.currentUser.profileUrl)
+                      : Image.file(_profileImage!, fit: BoxFit.cover),
+                ),
+              ),
+            ),
+            SizedBox(height: height * 0.015),
+            Center(
+              child: GestureDetector(
+                onTap: selectImage,
+                child: Text(
+                  "Change profile image",
+                  style: TextStyle(
+                    color: blueColor,
+                    fontSize: width * 0.04,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              sizeVer(15),
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    selectImage();
-                  },
-                  child: Text(
-                    "Change profile image",
-                    style: TextStyle(
-                      color: blueColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              sizeVer(15),
-              ProfileFormWidget(title: "Name", controller: _nameController),
-              sizeVer(15),
-              ProfileFormWidget(
-                title: "Username",
-                controller: _userNameController,
-              ),
-              sizeVer(15),
-              ProfileFormWidget(title: "Link", controller: _linkController),
-              sizeVer(15),
-              ProfileFormWidget(title: "Bio", controller: _bioController),
-              _isUpdating == true
-                  ? Row(
+            ),
+            SizedBox(height: height * 0.02),
+            ProfileFormWidget(
+              title: "Name",
+              controller: _nameController,
+            ),
+            SizedBox(height: height * 0.02),
+            ProfileFormWidget(
+              title: "Username",
+              controller: _userNameController,
+            ),
+            SizedBox(height: height * 0.02),
+            ProfileFormWidget(
+              title: "Link",
+              controller: _linkController,
+            ),
+            SizedBox(height: height * 0.02),
+            ProfileFormWidget(
+              title: "Bio",
+              controller: _bioController,
+            ),
+            SizedBox(height: height * 0.02),
+            _isUpdating
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "please wait...",
-                        style: TextStyle(color: Colors.white),
+                        "Please wait...",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.surface,
+                          fontSize: width * 0.04,
+                        ),
                       ),
-                      sizeVer(10),
-                      CircularProgressIndicator(),
+                      SizedBox(width: width * 0.03),
+                      SizedBox(
+                        width: width * 0.05,
+                        height: width * 0.05,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     ],
                   )
-                  : SizedBox(width: 0, height: 0),
-            ],
-          ),
+                : SizedBox.shrink(),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
   _clear() {
     setState(() {
       _isUpdating == false;

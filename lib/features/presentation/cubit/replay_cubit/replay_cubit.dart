@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lumeo/features/domain/entities/replay/replay_entity.dart';
 import 'package:lumeo/features/domain/usecases/replay/create_replay_usecase.dart';
 import 'package:lumeo/features/domain/usecases/replay/delete_replay_usecase.dart';
@@ -59,7 +60,9 @@ emit(ReplayFailure());
   }on SocketException catch(_){
     emit(ReplayFailure());
   } catch(e){
-    print(e);
+    if (kDebugMode) {
+      print(e);
+    }
 emit(ReplayFailure());
   }
 }

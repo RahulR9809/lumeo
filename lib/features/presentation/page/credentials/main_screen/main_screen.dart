@@ -1,18 +1,19 @@
-import 'package:flutter/cupertino.dart';
+
+
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/presentation/cubit/user/cubit/get_single_user/cubit/get_single_user_cubit.dart';
 import 'package:lumeo/features/presentation/page/home/home_page.dart';
 import 'package:lumeo/features/presentation/page/liked_posts/liked_posts.dart';
 import 'package:lumeo/features/presentation/page/post/upload_post_page.dart';
-import 'package:lumeo/features/presentation/page/profile/profile_page.dart';
+import 'package:lumeo/features/presentation/page/profile/profile_main_page.dart';
 import 'package:lumeo/features/presentation/page/search/search_page.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
 class MainScreen extends StatefulWidget {
   final String uid;
-    final int? index;
+  final int? index;
   const MainScreen({super.key, required this.uid, this.index});
 
   @override
@@ -21,7 +22,6 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
-
   late PageController pageController;
 
   @override
@@ -54,48 +54,109 @@ class _MainScreenState extends State<MainScreen> {
       builder: (context, getSingleUserState) {
         if (getSingleUserState is GetSingleUserLoaded) {
           final currentUser = getSingleUserState.user;
+
           return Scaffold(
-            bottomNavigationBar: CupertinoTabBar(
-              backgroundColor: backGroundColor,
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.home, color: whiteColor),
-                  label: 'Home',
+            extendBody: true,
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.only(bottom: 10, left: 15, right: 15),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                  child: Container(
+                    height: 70,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primary,
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.white10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildNavIcon(Icons.home, 0),
+                        _buildNavIcon(Icons.search, 1),
+                        _buildCenterButton(),
+                        _buildNavIcon(MdiIcons.heart, 3),
+                        _buildNavIcon(Icons.person, 4),
+                      ],
+                    ),
+                  ),
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.search, color: whiteColor),
-                  label: 'Search',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.add_circle, color: whiteColor),
-                  label: 'post',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(MdiIcons.heart, color: whiteColor),
-                  label: 'Liked',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person, color: whiteColor),
-                  label: 'profile',
-                ),
-              ],
-              onTap: navigationTapped,
+              ),
             ),
             body: PageView(
               controller: pageController,
+              onPageChanged: onPageChanged,
               children: [
                 HomePage(),
                 SearchPage(),
-                UploadPostPage(currentUser: currentUser,),
+                UploadPostPage(currentUser: currentUser),
                 LikedPosts(),
-                ProfilePage(currentUser: currentUser),
+                ProfileMainPage(currentUser: currentUser),
               ],
-              onPageChanged: onPageChanged,
             ),
           );
         }
         return Center(child: CircularProgressIndicator());
       },
+    );
+  }
+
+  Widget _buildNavIcon(IconData icon, int index) {
+    bool isActive = _currentIndex == index;
+    return GestureDetector(
+      onTap: () => navigationTapped(index),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 250),
+        padding: EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          // ignore: deprecated_member_use
+          color: isActive ? Colors.white.withOpacity(0.08) : Colors.transparent,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    // ignore: deprecated_member_use
+                    color: Colors.blueAccent.withOpacity(0.4),
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ]
+              : [],
+        ),
+        child: Icon(
+          icon,
+          color: isActive ? Colors.blueAccent : Theme.of(context).colorScheme.surface,
+          size: 26,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCenterButton() {
+    return GestureDetector(
+      onTap: () => navigationTapped(2),
+      child: Container(
+        height: 60,
+        width: 60,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.blueAccent, Colors.lightBlueAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              // ignore: deprecated_member_use
+              color: Colors.blueAccent.withOpacity(0.6),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Icon(Icons.add, size: 30, color: Theme.of(context).colorScheme.surface),
+      ),
     );
   }
 }

@@ -1,12 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-const backGroundColor = Colors.black;
-const whiteColor = Colors.white;
-const blueColor = Colors.blue;
-const primaryColor = Colors.black;
-const secondaryColor = Colors.grey;
+// const backGroundColor = Colors.black;
+// const whiteColor = Colors.white;
+// const primaryColor = Colors.black;
+// const secondaryColor = Colors.grey;
 const darkGreyColor = Color.fromARGB(255, 92, 92, 92);
+
+
+
+
+const blueColor = Colors.blue;
+
+final ThemeData lightTheme = ThemeData(
+  brightness: Brightness.light,
+  scaffoldBackgroundColor: Colors.white,
+  primaryColor: Colors.black,
+  colorScheme: const ColorScheme.light(
+    surface: Colors.white,
+    primary: Colors.black,
+    secondary: Colors.grey,
+    
+  ),
+);
+
+final ThemeData darkTheme = ThemeData(
+  brightness: Brightness.dark,
+  scaffoldBackgroundColor: Colors.black,
+  primaryColor: Colors.white,
+  colorScheme: const ColorScheme.dark(
+    surface: Colors.black,
+    primary: Colors.white,
+    secondary: Colors.grey,
+  ),
+);
+
+
+
 
 Widget sizeVer(double height) {
   return SizedBox(height: height);
@@ -32,6 +62,7 @@ class PageConst {
       static const String videoCallPage = "videoCallPage";
   static const String userListPage = "userListPage";
   static const String aboutPage = "aboutPage";
+  static const String forgotPasswordPage = 'forgotPasswordPage';
 
 }
 

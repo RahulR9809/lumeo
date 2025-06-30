@@ -4,9 +4,9 @@ import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/domain/entities/post/post_entity.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/presentation/cubit/auth/cubit/auth_cubit.dart';
-import 'package:lumeo/features/presentation/cubit/get_single_post/cubit/get_single_post_cubit.dart';
 import 'package:lumeo/features/presentation/cubit/post/cubit/post_cubit.dart';
-import 'package:lumeo/features/presentation/cubit/user/cubit/get_single_user/cubit/get_single_user_cubit.dart';
+import 'package:lumeo/features/presentation/cubit/theme/cubit/theme_cubit.dart';
+import 'package:lumeo/features/presentation/page/about/about_screen.dart';
 import 'package:lumeo/features/presentation/widgets/widget_profile.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -25,12 +25,10 @@ class _ProfilePageState extends State<ProfilePage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    BlocProvider.of<GetSingleUserCubit>(
-      context,
-    ).getSingleUser(uid: widget.currentUser.uid!);
+    // BlocProvider.of<GetSingleUserCubit>(
+    //   context,
+    // ).getSingleUser(uid: widget.currentUser.uid!);
     BlocProvider.of<PostCubit>(context).getPosts(post: PostEntity());
-    print('this is the current uid${widget.currentUser.uid}');
-    print('this is the other uid${widget.currentUser.otherUid}');
   }
 
   @override
@@ -41,43 +39,46 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    print('here');
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+
         title: Text(
           "${widget.currentUser.username}",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.surface),
         ),
         actions: [
           IconButton(
             onPressed: () {
               _openBottomModelSheet(context, widget.currentUser);
             },
-            icon: const Icon(Icons.menu),
+            icon:  Icon(Icons.menu, color: Theme.of(context).colorScheme.surface),
           ),
         ],
       ),
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(width * 0.04),
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 40,
+                  radius: width * 0.1,
                   backgroundColor: const Color.fromARGB(255, 83, 82, 82),
                   child: ClipOval(
                     child: SizedBox(
-                      width: 80,
-                      height: 80,
+                      width: width * 0.2,
+                      height: width * 0.2,
                       child: profilewidget(
                         imageUrl: widget.currentUser.profileUrl,
                       ),
                     ),
                   ),
                 ),
-
-                const SizedBox(width: 20),
+                SizedBox(width: width * 0.05),
                 Expanded(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -87,8 +88,8 @@ class _ProfilePageState extends State<ProfilePage>
                         label: "Posts",
                       ),
                       GestureDetector(
-                        onTap: (){
-                            Navigator.pushNamed(
+                        onTap: () {
+                          Navigator.pushNamed(
                             context,
                             PageConst.followersPage,
                             arguments: widget.currentUser,
@@ -119,7 +120,7 @@ class _ProfilePageState extends State<ProfilePage>
             ),
           ),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: width * 0.04),
             child: Row(
               children: [
                 Column(
@@ -127,26 +128,37 @@ class _ProfilePageState extends State<ProfilePage>
                   children: [
                     Text(
                       "${widget.currentUser.name == "" ? widget.currentUser.username : widget.currentUser.name}",
-                      style: TextStyle(fontSize: 15),
+                      style: TextStyle(
+                        fontSize: width * 0.04,
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: height * 0.005),
                     Text(
                       widget.currentUser.bio ?? '',
-                      style: TextStyle(fontSize: 13),
+                      style: TextStyle(
+                        fontSize: width * 0.035,
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
                     ),
-                    SizedBox(height: 4),
+                    SizedBox(height: height * 0.005),
                     Text(
                       widget.currentUser.link ?? '',
-                      style: TextStyle(fontSize: 13, color: Colors.blue),
+                      style: TextStyle(
+                        fontSize: width * 0.035,
+                        color: Colors.blue,
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-
           BlocBuilder<PostCubit, PostState>(
             builder: (context, postState) {
+              if (postState is PostFailure) {
+                return Center(child: Text("Failed to load posts"));
+              }
               if (postState is PostLoaded) {
                 final posts =
                     postState.posts
@@ -158,11 +170,11 @@ class _ProfilePageState extends State<ProfilePage>
                   padding: const EdgeInsets.all(2),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3,
-                    crossAxisSpacing: 2,
+                    crossAxisSpacing: 7,
                     mainAxisSpacing: 2,
                   ),
                   itemCount: posts.length,
-                  physics: ScrollPhysics(),
+                  physics: const ScrollPhysics(),
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     return GestureDetector(
@@ -173,9 +185,9 @@ class _ProfilePageState extends State<ProfilePage>
                           arguments: posts[index].postId,
                         );
                       },
-                      child: Container(
-                        width: 100,
-                        height: 100,
+                      child: SizedBox(
+                        width: width * 0.3,
+                        height: width * 0.3,
                         child: profilewidget(
                           imageUrl: posts[index].postImageUrl,
                         ),
@@ -184,7 +196,7 @@ class _ProfilePageState extends State<ProfilePage>
                   },
                 );
               }
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             },
           ),
         ],
@@ -197,8 +209,8 @@ class _ProfilePageState extends State<ProfilePage>
       context: context,
       builder: (context) {
         return Container(
-          height: 180,
-          decoration: BoxDecoration(color: backGroundColor),
+          height: 290,
+          decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -209,12 +221,12 @@ class _ProfilePageState extends State<ProfilePage>
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
-                    color: whiteColor,
+                    color: Theme.of(context).colorScheme.surface,
                   ),
                 ),
               ),
               sizeVer(5),
-              Divider(thickness: 1, color: secondaryColor),
+              Divider(thickness: 1, color: Theme.of(context).colorScheme.secondary),
               sizeVer(5),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
@@ -231,13 +243,13 @@ class _ProfilePageState extends State<ProfilePage>
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
-                      color: whiteColor,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                 ),
               ),
               sizeVer(5),
-              Divider(thickness: 1, color: secondaryColor),
+              Divider(thickness: 1, color: Theme.of(context).colorScheme.secondary),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: GestureDetector(
@@ -249,13 +261,68 @@ class _ProfilePageState extends State<ProfilePage>
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
-                      color: whiteColor,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                 ),
               ),
+
+
+sizeVer(5),
+Divider(thickness: 1, color: Theme.of(context).colorScheme.secondary),
+Padding(
+  padding: const EdgeInsets.only(left: 10),
+  child: BlocBuilder<ThemeCubit, ThemeMode>(
+    builder: (context, themeMode) {
+      final isDark = themeMode == ThemeMode.dark;
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+                    Icon(Icons.dark_mode, color: Theme.of(context).colorScheme.secondary),
+
+          Switch(
+            value: isDark,
+            activeColor:darkGreyColor,
+            onChanged: (value) {
+              context.read<ThemeCubit>().toggleTheme(value);
+            },
+          ),
+                    Icon(Icons.light_mode, color: Theme.of(context).colorScheme.secondary),
+
+        ],
+      );
+    },
+  ),
+),
+
+
+
               sizeVer(5),
-              Divider(thickness: 1, color: secondaryColor),
+              Divider(thickness: 1, color: Theme.of(context).colorScheme.secondary),
+              Padding(
+                padding: const EdgeInsets.only(left: 10),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AboutPage()),
+                    );
+                  },
+                  child: Text(
+                    "About",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+                  ),
+                ),
+              ),
+
+
+              sizeVer(5),
+              Divider(thickness: 1, color: Theme.of(context).colorScheme.secondary),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: GestureDetector(
@@ -272,7 +339,7 @@ class _ProfilePageState extends State<ProfilePage>
                     style: TextStyle(
                       fontWeight: FontWeight.w400,
                       fontSize: 16,
-                      color: whiteColor,
+                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ),
                 ),
@@ -297,9 +364,13 @@ class _ProfileStat extends StatelessWidget {
       children: [
         Text(
           count,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style:  TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.surface,
+          ),
         ),
-        Text(label, style: const TextStyle(fontSize: 14)),
+        Text(label, style:  TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.surface)),
       ],
     );
   }

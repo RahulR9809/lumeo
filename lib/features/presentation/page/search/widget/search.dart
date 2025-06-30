@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lumeo/consts.dart';
 
 class Search extends StatelessWidget {
   final TextEditingController controller;
@@ -10,17 +9,17 @@ class Search extends StatelessWidget {
     return Container(width: double.infinity,
     height: 45,
     decoration: BoxDecoration(
-      color: secondaryColor,
+      color: Theme.of(context).colorScheme.secondary,
       borderRadius: BorderRadius.circular(15)
     ),
     child: TextFormField(
       controller: controller,
-      style: TextStyle(color: whiteColor),
+      style: TextStyle(color: Theme.of(context).colorScheme.surface),
       decoration: InputDecoration(
         border: InputBorder.none,
-        prefixIcon: Icon(Icons.search,color: whiteColor,),
+        prefixIcon: Icon(Icons.search,color: Theme.of(context).colorScheme.surface,),
         hintText: "Search",
-        hintStyle: TextStyle(color: secondaryColor,fontSize: 15)
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.secondary,fontSize: 15)
       ),
     ),
     );

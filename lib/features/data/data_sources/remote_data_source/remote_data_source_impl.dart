@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:lumeo/consts.dart';
 import 'package:lumeo/features/data/data_sources/cloudinary/cludinary_data_source.dart';
 import 'package:lumeo/features/data/data_sources/remote_data_source/remote_data_source.dart';
@@ -139,7 +141,9 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
           password: user.password!,
         );
       } else {
-        print("fields cannot be empty");
+        if (kDebugMode) {
+          print("fields cannot be empty");
+        }
       }
     } on FirebaseAuthException catch (error) {
       if (error.code == "user-not-found") {
@@ -158,49 +162,66 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
   @override
   Future<void> signUpUser(UserEntity user) async {
     try {
-      print("Attempting to create user with email: ${user.email}");
+      if (kDebugMode) {
+        print("Attempting to create user with email: ${user.email}");
+      }
       await firebaseAuth
           .createUserWithEmailAndPassword(
             email: user.email!,
             password: user.password!,
           )
           .then((value) async {
-            print("User created successfully, checking UID...");
+            if (kDebugMode) {
+              print("User created successfully, checking UID...");
+            }
             if (value.user?.uid != null) {
               String profileUrl = '';
               if (user.profileImageFile != null) {
-                print("Profile image found, uploading...");
+                if (kDebugMode) {
+                  print("Profile image found, uploading...");
+                }
                 profileUrl = await cloudinaryRepository
                     .uploadProfileImageToStorage(
                       user.profileImageFile,
                       'profileImages',
                     );
-                print("Profile image uploaded, URL: $profileUrl");
+                if (kDebugMode) {
+                  print("Profile image uploaded, URL: $profileUrl");
+                }
 
                 await createUserWithProfileImage(user, profileUrl);
               } else {
-                print("No profile image found, creating user without it...");
+                if (kDebugMode) {
+                  print("No profile image found, creating user without it...");
+                }
                 await createUser(user);
               }
             }
           });
-      print("Sign up process completed.");
+      if (kDebugMode) {
+        print("Sign up process completed.");
+      }
       return;
     } on FirebaseAuthException catch (e) {
-      print("FirebaseAuthException caught: ${e.code}");
+      if (kDebugMode) {
+        print("FirebaseAuthException caught: ${e.code}");
+      }
       if (e.code == "email-already-in-use") {
         toast("email is already taken");
       } else {
         toast("something went wrong");
       }
     } catch (e) {
-      print("An error occurred: $e");
+      if (kDebugMode) {
+        print("An error occurred: $e");
+      }
     }
   }
 
   @override
   Future<void> updateUser(UserEntity user) async {
     final userCollection = firebaseFirestore.collection(FirebaseConst.users);
+    // ignore: prefer_collection_literals
     Map<String, dynamic> userInformation = Map();
 
     if (user.username != "" && user.username != null) {
@@ -213,7 +234,6 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
     String profileUrl = '';
 
     if (user.profileImageFile != null) {
-      print("Profile image found, uploading...");
       profileUrl = await cloudinaryRepository.uploadProfileImageToStorage(
         user.profileImageFile,
         'profileImages',
@@ -244,24 +264,34 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
   Future<void> createPost(PostEntity post) async {
     final postCollection = firebaseFirestore.collection(FirebaseConst.posts);
 
-    print('[createPost] Called with postId: ${post.postId}');
+    if (kDebugMode) {
+      print('[createPost] Called with postId: ${post.postId}');
+    }
 
     try {
       String postImageUrl = post.postImageUrl ?? '';
-      print('[createPost] Initial postImageUrl: $postImageUrl');
+      if (kDebugMode) {
+        print('[createPost] Initial postImageUrl: $postImageUrl');
+      }
 
       // Upload post image if it exists
       if (post.postImage != null) {
-        print('[createPost] Post image found, starting upload...');
+        if (kDebugMode) {
+          print('[createPost] Post image found, starting upload...');
+        }
         postImageUrl = await cloudinaryRepository.uploadPostImageToStorage(
           post.postImage!,
           'postImageUrl',
         );
-        print(
+        if (kDebugMode) {
+          print(
           '[createPost] Post image uploaded successfully. URL: $postImageUrl',
         );
+        }
       } else {
-        print('[createPost] No post image found. Skipping image upload.');
+        if (kDebugMode) {
+          print('[createPost] No post image found. Skipping image upload.');
+        }
       }
 
       final newPost =
@@ -278,12 +308,12 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
             createAt: post.createAt,
           ).toJson();
 
-      print('[createPost] PostModel converted to JSON: $newPost');
+      if (kDebugMode) {
+        print('[createPost] PostModel converted to JSON: $newPost');
+      }
 
       final postDocRef = await postCollection.doc(post.postId).get();
-      print('[createPost] Checked Firestore for existing post document');
       if (!postDocRef.exists) {
-        print('[createPost] Document does not exist. Creating new post...');
         await postCollection.doc(post.postId).set(newPost).then((value) async {
           final userDocRef = firebaseFirestore
               .collection(FirebaseConst.users)
@@ -295,35 +325,43 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
             if (userData != null) {
               final totalPosts = (userData['totalPosts'] ?? 0) as int;
               await userDocRef.update({"totalPosts": totalPosts + 1});
-              print('[createPost] Total posts updated to ${totalPosts + 1}');
+              if (kDebugMode) {
+                print('[createPost] Total posts updated to ${totalPosts + 1}');
+              }
             }
           }
         });
-        print('[createPost] Post created successfully.');
       } else {
-        print('[createPost] Document already exists. Updating post...');
         await postCollection.doc(post.postId).update(newPost);
-        print('[createPost] Post updated successfully.');
+        if (kDebugMode) {
+          print('[createPost] Post updated successfully.');
+        }
       }
     } catch (e, stackTrace) {
-      print('[createPost] ❌ An error occurred while creating the post: $e');
-      print('[createPost] Stack trace: $stackTrace');
+      if (kDebugMode) {
+        print('[createPost] Stack trace: $stackTrace');
+      }
     }
   }
 
+  @override
   Future<void> deletePost(PostEntity post) async {
     final postCollection = firebaseFirestore.collection(FirebaseConst.posts);
 
     if (post.creatorUid == null) {
-      print(
+      if (kDebugMode) {
+        print(
         '[deletePost] ❌ creatorUid is null! Cannot update user post count.',
       );
+      }
       return;
     }
 
     try {
       await postCollection.doc(post.postId).delete();
-      print('[deletePost] Deleted post with ID: ${post.postId}');
+      if (kDebugMode) {
+        print('[deletePost] Deleted post with ID: ${post.postId}');
+      }
 
       final userDocRef = firebaseFirestore
           .collection(FirebaseConst.users)
@@ -331,22 +369,36 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
 
       final userDoc = await userDocRef.get();
       if (userDoc.exists) {
-        print('[deletePost] User document exists for UID: ${post.creatorUid}');
+        if (kDebugMode) {
+          print('[deletePost] User document exists for UID: ${post.creatorUid}');
+        }
         final userData = userDoc.data();
-        print('[deletePost] User data: $userData');
+        if (kDebugMode) {
+          print('[deletePost] User data: $userData');
+        }
         final totalPosts = (userData?['totalPosts'] ?? 0) as int;
-        print('[deletePost] Current totalPosts: $totalPosts');
+        if (kDebugMode) {
+          print('[deletePost] Current totalPosts: $totalPosts');
+        }
 
         await userDocRef.update({'totalPosts': totalPosts - 1});
-        print('[deletePost] totalPosts decremented to ${totalPosts - 1}');
+        if (kDebugMode) {
+          print('[deletePost] totalPosts decremented to ${totalPosts - 1}');
+        }
       } else {
-        print(
+        if (kDebugMode) {
+          print(
           '[deletePost] ❌ User document does not exist for UID: ${post.creatorUid}',
         );
+        }
       }
     } catch (e, st) {
-      print('[deletePost] ❌ Error: $e');
-      print(st);
+      if (kDebugMode) {
+        print('[deletePost] ❌ Error: $e');
+      }
+      if (kDebugMode) {
+        print(st);
+      }
     }
   }
 
@@ -376,21 +428,20 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
   @override
   Future<void> updatePost(PostEntity post) async {
     String postImageUrl = post.postImageUrl ?? '';
-    print('[createPost] Initial postImageUrl: $postImageUrl');
 
     bool imageUpdated = false;
 
     if (post.postImage != null) {
-      print('[createPost] Post image found, starting upload...');
       final updatedUrl = await cloudinaryRepository.uploadPostImageToStorage(
         post.postImage!,
         'postImageUrl',
       );
-      print('[createPost] Post image uploaded successfully. URL: $updatedUrl');
       postImageUrl = updatedUrl;
       imageUpdated = true; // mark that a new image was uploaded
     } else {
-      print('[createPost] No post image found. Skipping image upload.');
+      if (kDebugMode) {
+        print('[createPost] No post image found. Skipping image upload.');
+      }
     }
 
     final postCollection = firebaseFirestore.collection(FirebaseConst.posts);
@@ -472,8 +523,9 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
         await commentCollection.doc(comment.commentId).update(newComment);
       }
     } catch (e) {
-      print("some error occured ${e}");
-    }
+if (kDebugMode) {
+        print("some error occured $e");
+      }    }
   }
 
   @override
@@ -497,8 +549,9 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
         });
       });
     } catch (e) {
-      print("some error occured ${e}");
-    }
+if (kDebugMode) {
+        print("some error occured $e");
+      }    }
   }
 
   @override
@@ -523,7 +576,9 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
         }
       }
     } catch (e) {
-      print("some error occured ${e}");
+      if (kDebugMode) {
+        print("some error occured $e");
+      }
     }
   }
 
@@ -547,8 +602,9 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
         .doc(comment.postId)
         .collection(FirebaseConst.comment);
     Map<String, dynamic> commentInfo = {};
-    if (comment.description != "" && comment.description != null)
+    if (comment.description != "" && comment.description != null) {
       commentInfo["description"] = comment.description;
+    }
     commentCollection.doc(comment.commentId).update(commentInfo);
   }
 
@@ -584,7 +640,9 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
         replayCollection.doc(replay.replayId).update(newReplay);
       }
     } catch (e) {
-      print("some error occured ${e}");
+      if (kDebugMode) {
+        print("some error occured $e");
+      }
     }
   }
 
@@ -600,7 +658,9 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
     try {
       replayCollection.doc(replay.replayId).delete();
     } catch (e) {
-      print("some error occured ${e}");
+      if (kDebugMode) {
+        print("some error occured $e");
+      }
     }
   }
 
@@ -654,9 +714,11 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
         .doc(replay.commentId)
         .collection(FirebaseConst.replay);
 
+    // ignore: prefer_collection_literals
     Map<String, dynamic> replayinfo = Map();
-    if (replay.description != "" && replay.description != null)
+    if (replay.description != "" && replay.description != null) {
       replayinfo['description'] = replay.description;
+    }
     replayCollection.doc(replay.replayId).update(replayinfo);
   }
 
@@ -680,11 +742,14 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
         "savedAt": FieldValue.serverTimestamp()
       });
     } else {
-      print('post already present');
+      if (kDebugMode) {
+        print('post already present');
+      }
     }
   }
 
 
+  @override
   Stream<List<SavedpostsEntity>> readSavedPost(String userId) {
     final savedPostsuser = firebaseFirestore
         .collection("saved posts")
@@ -692,7 +757,6 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
 
     var savedposts = savedPostsuser.snapshots().map((querySnapshot) =>
         querySnapshot.docs.map((e) => SavedpostModel.fromSnapshot(e)).toList());
-    print(savedposts);
 
     return savedposts;
   }
@@ -770,10 +834,14 @@ Future<void> deleteSavedPost(String postId, String userId) async {
         }
       });
 
-      print("Follow/unfollow transaction completed successfully");
+      if (kDebugMode) {
+        print("Follow/unfollow transaction completed successfully");
+      }
     } catch (e) {
-      print("Error in followUser transaction: $e");
-      throw e;
+      if (kDebugMode) {
+        print("Error in followUser transaction: $e");
+      }
+      rethrow;
     }
   }
   
@@ -783,6 +851,66 @@ Future<void> deleteSavedPost(String postId, String userId) async {
 final snapshot= await firebaseFirestore.collection("posts").where("likes",arrayContains: currentuid).get();
 return snapshot.docs.map((doc)=>PostModel.fromSnapshot(doc)).toList();
   }
+  
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+@override
+Future<String> googleSignIn() async {
+  try {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) {
+      throw Exception("Google Sign-In cancelled");
+    }
+
+
+    final googleAuth = await googleUser.authentication;
+
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+    final user = userCredential.user;
+
+    if (user == null) {
+      throw Exception("Firebase user is null");
+    }
+
+    final firebaseUser = UserEntity(
+      uid: user.uid,
+      name: user.displayName ?? "",
+      email: user.email ?? "",
+      profileUrl: user.photoURL,
+      bio: null,
+      username: user.displayName,
+      followers: const [],
+      following: const [],
+      totalFollowers: 0,
+      totalFollowing: 0,
+      link: null,
+    );
+
+    if(user.photoURL==null){
+      createUser(firebaseUser);
+    }else{
+    await createUserWithProfileImage(firebaseUser, user.photoURL!);
+    }
+
+    return user.uid;
+
+  } on FirebaseAuthException catch (e) {
+    if (kDebugMode) {
+      print("[ERROR] FirebaseAuthException: ${e.message}");
+    }
+    rethrow;
+  } catch (e) {
+    if (kDebugMode) {
+      print("[ERROR] Google Sign-In failed: $e");
+    }
+    rethrow;
+  }
+}
 
 
  

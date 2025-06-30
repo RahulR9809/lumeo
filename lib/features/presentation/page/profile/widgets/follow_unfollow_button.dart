@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 class FollowButton extends StatelessWidget {
@@ -16,22 +17,32 @@ class FollowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+
     return SizedBox(
+      width: width * 0.35,
+      height: 42,
       child: ElevatedButton(
         onPressed: onTapListener,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: textColor,
-          elevation: 0,
+          elevation: 2,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: const BorderSide(color: Colors.black),
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(color: backgroundColor),
           ),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
         ),
-        child: Text(
-          text,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
+        child: FittedBox(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: width * 0.04,
+              color: textColor,
+              letterSpacing: 0.5,
+            ),
           ),
         ),
       ),

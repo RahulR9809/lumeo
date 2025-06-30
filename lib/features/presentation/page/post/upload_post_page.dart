@@ -36,32 +36,32 @@ class _UploadPostPageState extends State<UploadPostPage> {
     }
   }
 
-  Future<void> _pickVideo() async {
-    final pickedFile = await _picker.pickVideo(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      _initializeVideo(File(pickedFile.path));
-    }
-  }
+  // Future<void> _pickVideo() async {
+  //   final pickedFile = await _picker.pickVideo(source: ImageSource.gallery);
+  //   if (pickedFile != null) {
+  //     _initializeVideo(File(pickedFile.path));
+  //   }
+  // }
 
-  Future<void> _recordVideo() async {
-    final pickedFile = await _picker.pickVideo(source: ImageSource.camera);
-    if (pickedFile != null) {
-      _initializeVideo(File(pickedFile.path));
-    }
-  }
+  // Future<void> _recordVideo() async {
+  //   final pickedFile = await _picker.pickVideo(source: ImageSource.camera);
+  //   if (pickedFile != null) {
+  //     _initializeVideo(File(pickedFile.path));
+  //   }
+  // }
 
-  void _initializeVideo(File videoFile) {
-    _disposeVideoController();
-    _videoController = VideoPlayerController.file(videoFile)
-      ..initialize().then((_) {
-        setState(() {
-          _selectedVideo = videoFile;
-          _selectedImages.clear();
-        });
-        _videoController!.setLooping(true);
-        _videoController!.play();
-      });
-  }
+  // void _initializeVideo(File videoFile) {
+  //   _disposeVideoController();
+  //   _videoController = VideoPlayerController.file(videoFile)
+  //     ..initialize().then((_) {
+  //       setState(() {
+  //         _selectedVideo = videoFile;
+  //         _selectedImages.clear();
+  //       });
+  //       _videoController!.setLooping(true);
+  //       _videoController!.play();
+  //     });
+  // }
 
   void _disposeVideoController() {
     _videoController?.dispose();
@@ -88,184 +88,205 @@ class _UploadPostPageState extends State<UploadPostPage> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "New Post",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+
+@override
+Widget build(BuildContext context) {
+  final width = MediaQuery.of(context).size.width;
+  final height = MediaQuery.of(context).size.height;
+
+  return Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.primary,
+
+    appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+
+      title:  Text(
+        "New Post",
+        style: TextStyle(fontWeight: FontWeight.bold,color: Theme.of(context).colorScheme.surface),
       ),
-      backgroundColor: primaryColor,
-      body: Column(
-        children: [
-          Expanded(
-            child:
-                _selectedImages.isEmpty && _selectedVideo == null
-                    ? Center(
-                      child: GestureDetector(
-                        onTap: _showMediaOptions,
-                        child: Container(
-                          height: 150,
-                          width: 150,
-                          decoration: const BoxDecoration(
-                            color: Colors.grey,
-                            shape: BoxShape.circle,
+    ),
+    body: Column(
+      children: [
+        Expanded(
+          child: _selectedImages.isEmpty && _selectedVideo == null
+              ? Center(
+                  child: GestureDetector(
+                    onTap: _showMediaOptions,
+                    child: Container(
+                      height: height * 0.18,
+                      width: height * 0.18,
+                      decoration:  BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.upload,
+                        color: Theme.of(context).colorScheme.surface,
+                        size: width * 0.12,
+                      ),
+                    ),
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_selectedVideo != null && _videoController != null)
+                        SizedBox(
+                          height: height * 0.5,
+                          child: Stack(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  if (_videoController!.value.isPlaying) {
+                                    _videoController!.pause();
+                                  } else {
+                                    _videoController!.play();
+                                  }
+                                  setState(() {});
+                                },
+                                child: AspectRatio(
+                                  aspectRatio:
+                                      _videoController!.value.aspectRatio,
+                                  child: VideoPlayer(_videoController!),
+                                ),
+                              ),
+                              Positioned(
+                                top: height * 0.01,
+                                right: width * 0.03,
+                                child: GestureDetector(
+                                  onTap: _deleteVideo,
+                                  child: CircleAvatar(
+                                    radius: width * 0.035,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(
+                                      Icons.close,
+                                      size: width * 0.035,
+                                      color: Theme.of(context).colorScheme.surface,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          child: const Icon(
-                            Icons.upload,
-                            color: Colors.white,
-                            size: 50,
+                        ),
+                      if (_selectedImages.isNotEmpty)
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: width * 0.03,
+                            vertical: height * 0.06,
+                          ),
+                          child: Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.file(
+                                  _selectedImages.first,
+                                  width: double.infinity,
+                                  height: height * 0.35,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                top: height * 0.01,
+                                right: width * 0.03,
+                                child: GestureDetector(
+                                  onTap: () => _deleteImage(0),
+                                  child: CircleAvatar(
+                                    radius: width * 0.035,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(
+                                      Icons.close,
+                                      size: width * 0.035,
+                                      color: Theme.of(context).colorScheme.surface,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      Padding(
+                        padding: EdgeInsets.all(width * 0.03),
+                        child: TextField(
+                          controller: _captionController,
+                          style:  TextStyle(color: Theme.of(context).colorScheme.surface),
+                          decoration: InputDecoration(
+                            hintText: "Write a caption...",
+                            hintStyle: TextStyle(color: Theme.of(context).colorScheme.surface),
+                            filled: true,
+                            fillColor: Theme.of(context).colorScheme.primary,
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: height * 0.018,
+                              horizontal: width * 0.04,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.surface,
+                                width: 1.5,
+                              ),
+                            ),
+                          ),
+                          maxLines: null,
+                        ),
+                      ),
+                      SizedBox(height: height * 0.015),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: darkGreyColor,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: width * 0.12,
+                            vertical: height * 0.015,
+                          ),
+                        ),
+                        onPressed: () {
+                          _createSubmitPost(context);
+                        },
+                        child: Text(
+                          "Post",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.surface,
+                            fontSize: width * 0.045,
                           ),
                         ),
                       ),
-                    )
-                    : SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (_selectedVideo != null &&
-                              _videoController != null)
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.5,
-                              child: Stack(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (_videoController!.value.isPlaying) {
-                                        _videoController!.pause();
-                                      } else {
-                                        _videoController!.play();
-                                      }
-                                      setState(() {});
-                                    },
-                                    child: AspectRatio(
-                                      aspectRatio:
-                                          _videoController!.value.aspectRatio,
-                                      child: VideoPlayer(_videoController!),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child: GestureDetector(
-                                      onTap: _deleteVideo,
-                                      child: CircleAvatar(
-                                        radius: 14,
-                                        backgroundColor: Colors.red,
-                                        child: Icon(
-                                          Icons.close,
-                                          size: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_selectedImages.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 58,
-                              ),
-                              child: Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Image.file(
-                                      _selectedImages.first,
-                                      width: double.infinity,
-                                      height: 300,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 8,
-                                    right: 8,
-                                    child: GestureDetector(
-                                      onTap: () => _deleteImage(0),
-                                      child: const CircleAvatar(
-                                        radius: 14,
-                                        backgroundColor: Colors.red,
-                                        child: Icon(
-                                          Icons.close,
-                                          size: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: TextField(
-                              controller: _captionController,
-                              style: const TextStyle(color: Colors.white),
-                              decoration: InputDecoration(
-                                hintText: "Write a caption...",
-                                hintStyle: TextStyle(color: whiteColor),
-                                filled: true,
-                                fillColor: backGroundColor,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                  horizontal: 16,
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: BorderSide(
-                                    color: Colors.white.withOpacity(0.3),
+                      SizedBox(height: height * 0.025),
+                      _uploading
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Uploading...",
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.surface,
+                                    fontSize: width * 0.04,
                                   ),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(14),
-                                  borderSide: BorderSide(
-                                    color: Colors.white.withOpacity(0.7),
-                                    width: 1.5,
-                                  ),
+                                SizedBox(width: width * 0.02),
+                                SizedBox(
+                                  width: width * 0.05,
+                                  height: width * 0.05,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
                                 ),
-                              ),
-                              maxLines: null,
-                            ),
-                          ),
-                          sizeVer(10),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: darkGreyColor,
-                            ),
-                            onPressed: () {
-                              _createSubmitPost(context);
-                            },
-                            child: Text(
-                              "post",
-                              style: TextStyle(color: whiteColor),
-                            ),
-                          ),
-                          sizeVer(20),
-                          _uploading==true? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Uploading...",
-                                style: TextStyle(color: whiteColor),
-                              ),
-                            sizeHor(10),
-                            CircularProgressIndicator()
-                            ],
-                          ):SizedBox(height: 0,width: 0,)
-                        ],
-                      ),
-                    ),
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
-    );
-  }
+                              ],
+                            )
+                          : SizedBox.shrink(),
+                    ],
+                  ),
+                ),
+        ),
+        SizedBox(height: height * 0.015),
+      ],
+    ),
+  );
+}
 
   void _showMediaOptions() {
     showModalBottomSheet(
@@ -275,7 +296,7 @@ class _UploadPostPageState extends State<UploadPostPage> {
       builder: (context) {
         return Container(
           decoration: BoxDecoration(
-            color: primaryColor,
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
           ),
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
@@ -290,25 +311,25 @@ class _UploadPostPageState extends State<UploadPostPage> {
                   _pickImages();
                 },
               ),
-              const Divider(color: Colors.grey),
-              _buildOption(
-                icon: Icons.video_library,
-                text: "Choose Video from Gallery",
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickVideo();
-                },
-              ),
-              const Divider(color: Colors.grey),
-              _buildOption(
-                icon: Icons.videocam,
-                text: "Record a Video",
-                onTap: () {
-                  Navigator.pop(context);
-                  _recordVideo();
-                },
-              ),
-              const Divider(color: Colors.grey),
+              // const Divider(color: Colors.grey),
+              // _buildOption(
+              //   icon: Icons.video_library,
+              //   text: "Choose Video from Gallery",
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     _pickVideo();
+              //   },
+              // ),
+              // const Divider(color: Colors.grey),
+              // // _buildOption(
+              //   icon: Icons.videocam,
+              //   text: "Record a Video",
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     _recordVideo();
+              //   },
+              // ),
+              // const Divider(color: Colors.grey),
               _buildOption(
                 icon: Icons.cancel,
                 text: "Cancel",
@@ -334,12 +355,12 @@ class _UploadPostPageState extends State<UploadPostPage> {
         padding: const EdgeInsets.symmetric(vertical: 15),
         child: Row(
           children: [
-            Icon(icon, color: isCancel ? Colors.red : Colors.white, size: 28),
+            Icon(icon, color: isCancel ? Colors.red : Theme.of(context).colorScheme.surface, size: 28),
             const SizedBox(width: 15),
             Text(
               text,
               style: TextStyle(
-                color: isCancel ? Colors.red : Colors.white,
+                color: isCancel ? Colors.red : Theme.of(context).colorScheme.surface,
                 fontSize: 18,
               ),
             ),
@@ -351,30 +372,32 @@ class _UploadPostPageState extends State<UploadPostPage> {
 
   _createSubmitPost(BuildContext context) {
     setState(() {
-       _uploading=true;
+      _uploading = true;
     });
-    BlocProvider.of<PostCubit>(context).createPost(
-      post: PostEntity(
-        description: _captionController.text,
-        createAt: Timestamp.now(),
-        creatorUid: widget.currentUser.uid,
-        likes: [],
-        postId: Uuid().v1(),
-        postImageUrl: '',
-        postImage: _selectedImages[0],
-        totalComments: 0,
-        totalLikes: 0,
-        userName: widget.currentUser.username,
-        userProfileUrl: widget.currentUser.profileUrl,
-      ),
-    ).then((value)=>_clear());
+    BlocProvider.of<PostCubit>(context)
+        .createPost(
+          post: PostEntity(
+            description: _captionController.text,
+            createAt: Timestamp.now(),
+            creatorUid: widget.currentUser.uid,
+            likes: [],
+            postId: Uuid().v1(),
+            postImageUrl: '',
+            postImage: _selectedImages[0],
+            totalComments: 0,
+            totalLikes: 0,
+            userName: widget.currentUser.username,
+            userProfileUrl: widget.currentUser.profileUrl,
+          ),
+        )
+        .then((value) => _clear());
   }
-  
+
   _clear() {
     _captionController.clear();
     _selectedImages.clear();
     setState(() {
-      _uploading=false;
+      _uploading = false;
     });
   }
 }

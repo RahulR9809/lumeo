@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/domain/usecases/firebase_usecases/user/get_single_user_usecase.dart';
 
@@ -15,37 +16,36 @@ class GetSingleUserCubit extends Cubit<GetSingleUserState> {
     
   Future<void> getSingleUser({required String uid}) async {
   emit(GetSingleUserLoading());
-  print('State: GetSingleUserLoading');
   
   try {
-    print('Entered try block');
     final streamResponse = getSingleUserUsecase.call(uid);
-print(streamResponse);
     streamResponse.listen(
       (users) {
-        print('Stream emitted: $users');
         if (users.isNotEmpty) {
-          print('State: GetSingleUserLoaded');
           emit(GetSingleUserLoaded(user: users.first));
         } else {
-          print('Stream emitted empty list');
           emit(GetSingleUserFailure());
         }
       },
       onError: (error) {
-        print('Stream error: $error');
         emit(GetSingleUserFailure());
       },
       onDone: () {
-        print('Stream closed');
+        if (kDebugMode) {
+          print('Stream closed');
+        }
       },
       cancelOnError: true,
     );
   } on SocketException catch (_) {
-    print('SocketException occurred');
+    if (kDebugMode) {
+      print('SocketException occurred');
+    }
     emit(GetSingleUserFailure());
   } catch (e) {
-    print('Exception occurred: $e');
+    if (kDebugMode) {
+      print('Exception occurred: $e');
+    }
     emit(GetSingleUserFailure());
   }
 }

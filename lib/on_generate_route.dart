@@ -6,6 +6,7 @@ import 'package:lumeo/features/domain/entities/post/post_entity.dart';
 import 'package:lumeo/features/domain/entities/user/user_entity.dart';
 import 'package:lumeo/features/presentation/page/chat/chatpage.dart';
 import 'package:lumeo/features/presentation/page/chat/userlistpage.dart';
+import 'package:lumeo/features/presentation/page/credentials/forgot_password/forgot_password.dart';
 import 'package:lumeo/features/presentation/page/credentials/login_page.dart';
 import 'package:lumeo/features/presentation/page/credentials/register_page.dart';
 import 'package:lumeo/features/presentation/page/post/comment/comment_page.dart';
@@ -70,7 +71,7 @@ class OnGenerateRoute {
       case PageConst.singleProfilePage:
         {
           if (args is String) {
-            return routebuilder(SingleProfilePage(otheruserId: args));
+            return routebuilder(SingleProfilePage(otheruserId: args,));
           }
           return routebuilder(NoPageFound());
         }
@@ -78,28 +79,31 @@ class OnGenerateRoute {
         {
           return routebuilder(SavedPostpage());
         }
+      case PageConst.forgotPasswordPage:
+        {
+          return routebuilder(const ForgotPasswordPage());
+        }
 
+      case PageConst.followingPage:
+        if (args is UserEntity) {
+          return routebuilder(FollowingPage(user: args));
+        }
 
-             case PageConst.followingPage:
-        
-          if (args is UserEntity) {
-            return routebuilder(FollowingPage(user: args));
-          }
-
-               case PageConst.followersPage:
-        
-          if (args is UserEntity) {
-            return routebuilder(FollowersPage(user: args));
-          }
-     case PageConst.chatPage:
+      case PageConst.followersPage:
+        if (args is UserEntity) {
+          return routebuilder(FollowersPage(user: args));
+        }
+      case PageConst.chatPage:
         {
           if (args is Map<dynamic, dynamic>) {
-            return routebuilder(ChatPage(
-              currentUserId: args['currentUserId']!,
-              peerId: args['peerId']!,
-              peerName: args['peerName'],
-              currentUserName: args["currentUserName"],
-            ));
+            return routebuilder(
+              ChatPage(
+                currentUserId: args['currentUserId']!,
+                peerId: args['peerId']!,
+                peerName: args['peerName'],
+                currentUserName: args["currentUserName"],
+              ),
+            );
           }
         }
       case PageConst.userListPage:

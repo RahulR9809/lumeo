@@ -12,7 +12,20 @@
           "package_name": "com.example.lumeo"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "790883888590-og8qdr24326si59jv57jav97ufk63uns.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.lumeo",
+            "certificate_hash": "3c170fe9168894da425aeafc9399845312a864a2"
+          }
+        },
+        {
+          "client_id": "790883888590-s8mum77oap4ito3cn6nj66thj4g63oos.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDrGbfpaRrrIpmQgYO3ag0Md6bR45m_o70"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "790883888590-s8mum77oap4ito3cn6nj66thj4g63oos.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

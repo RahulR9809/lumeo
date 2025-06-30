@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+// ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 import 'package:lumeo/features/data/data_sources/cloudinary/cludinary_data_source.dart';
 
@@ -45,35 +46,6 @@ Future<String> uploadProfileImageToStorage(File? file, String childName) async {
     throw Exception("Failed to upload profile image: $resStr");
   }
 }
-
-
-
-// @override
-// Future<String> uploadProfileImageToStorage(File? file, String childName) async {
-//   if (file == null) throw Exception("File is null");
-
-//   final uri = Uri.parse("https://api.cloudinary.com/v1_1/$cloudName/image/upload");
-
-//   final publicId = "profilePics/$childName/profile"; // fixed name ensures overwrite
-
-//   final request = http.MultipartRequest('POST', uri)
-//     ..fields['upload_preset'] = profileImageUploadPreset
-//     ..fields['public_id'] = publicId
-//     ..fields['overwrite'] = 'true'
-//     ..files.add(await http.MultipartFile.fromPath('file', file.path));
-
-//   final response = await request.send();
-//   final resStr = await response.stream.bytesToString();
-
-//   if (response.statusCode == 200) {
-//     final data = json.decode(resStr);
-//     return data['secure_url'];
-//   } else {
-//     throw Exception("Failed to upload profile image: $resStr");
-//   }
-// }
-
-
 
 @override
 Future<String> uploadPostImageToStorage(File? file, String childName) async {
